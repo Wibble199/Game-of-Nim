@@ -2,9 +2,14 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const WebSocket = require('ws');
+const GameManager = require('./GameManager');
 
 const CLIENT_FILES = path.resolve(__dirname + "/../client");
 const HTTP_PORT = 8080;
+const HEARTBEAT_INTERVAL = 10000; // Send a heartbeat this often
+const HEARTBEAT_TIMEOUT = 5000; // Wait this long for a heartbeat response
+
+var manager = new GameManager();
 
 /* ------------------ */
 /* Setup HTTP server */
@@ -41,14 +46,49 @@ var server = http.createServer((req, res) => {
 var socketServer = new WebSocket.Server({server});
 
 socketServer.on('connection', socket => {
-	console.log("Open connection");
+	// Assign client unique ID
+	let id = manager.connectClient(socket);
+	let heartbeatId, heartbeatTimeoutId;
+	let disconnectHandler;
 
+	console.log(`Client ${id} connected`);
+
+	// Handle receiving messages from this client
 	socket.on('message', msg => {
-		console.log("Message received", msg);
-		socket.send(msg);
+		try {
+			let json = JSON.parse(msg);
+			if (!json.event) // EVERYTHING should have an event property, throw an error if not
+				throw "No `event` property";
+			
+			// Check to see if there is any special handling for this message by the server
+			switch(json.event) {
+				case "beat": // Heartbeat response
+					clearTimeout(heartbeatTimeoutId); // Cancel the heartbeat timeout function
+					break;
+				
+				default: // Not a special message, so pass it on to the GameManager
+					manager.receiveMessage(msg, id);
+			}
+			
+		} catch (ex) {
+			console.error("Invalid JSON received:", ex);
+		}
 	});
 
-	socket.on('close', (code, reason) => {
-		console.log("Connection closed");
+	// Handle the client closing (disconnect)
+	socket.once('close', disconnectHandler = (code, reason) => {
+		socket.close();
+		manager.disconnectClient(id);
+		clearInterval(heartbeatId); // Stop the heartbeat checking
+		console.log(`Client ${id} disconnected`);
 	});
+
+	// Set up heartbeat to check if the client has closed due to a reason
+	// where the disconnect would not fire (e.g. network failure)
+	heartbeatId = setInterval(() => {
+		// Send the heartbeat
+		socket.send(`{"event": "heartbeat"}`);
+		// If the disconnect function passed to the timeout runs, the heartbeast was not answered in time
+		heartbeatTimeoutId = setTimeout(disconnectHandler, HEARTBEAT_TIMEOUT);
+	}, HEARTBEAT_INTERVAL);
 });

@@ -11,7 +11,15 @@ ws.addEventListener('open', e => {
 });
 
 ws.addEventListener('message', e => {
-	console.log("Message received", e);
+	var data = JSON.parse(e.data);
+	switch (data.event) { // Handle special events
+		case "heartbeat":
+			ws.send('{"event": "beat"}');
+			break;
+		default:
+			// Do whatever
+			console.log("Message received", data.event);
+	}
 });
 
 ws.addEventListener('close', e => {
