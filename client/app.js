@@ -24,15 +24,6 @@ ws.addEventListener('message', e => {
 	}
 });
 
-// --------------------- //
-// Setup route handling //
-// ------------------- //
-var router = new VueRouter({
-	routes: [
-		//{ path: "/", component: COMPONENT }	
-	]
-});
-
 // --------------- //
 // Vue components //
 // ------------- //
@@ -47,6 +38,34 @@ var bsModal = Vue.component('bs-modal', {
 	}
 });
 
+// ------------ //
+// Setup Views //
+// ---------- //
+var ViewWelcome = {
+	template: '#view-welcome',
+
+	methods: {
+		enterName: function() {
+			// TODO: send to server
+			router.replace("/lobby");
+		}
+	}
+};
+
+var ViewLobby = {
+	template: '#view-lobby'
+};
+
+// --------------------- //
+// Setup route handling //
+// ------------------- //
+var router = new VueRouter({
+	routes: [
+		{ path: "/", component: ViewWelcome },
+		{ path: "/lobby", component: ViewLobby }	
+	]
+});
+
 // --------------- //
 // Setup main app //
 // ------------- //
@@ -56,14 +75,14 @@ var app = new Vue({
 		bsModal: bsModal
 	},
 
+	// Application state data
+	data: {
+		userSetName: false
+	},
+
 	// Application methods
 	methods: {
 		reload: function() { window.location.reload(); }
-	},
-
-	// State for the application
-	data: {
-		webSocketConnected: false
 	}
 
 }).$mount('#app');

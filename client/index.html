@@ -13,12 +13,40 @@
 				<div>Will Bennion (22925040)</div>
 			</nav>
 
-			<router-view></router-view>
+			<div class="main-container">
+				<router-view></router-view>
+			</div>
 
 			<bs-modal id="network-error-modal" title="Network Error" v-bind:buttons="[{label:'Reload', class:'btn-primary', callback: reload}]">
 				<p>You have been disconnected from the server.</p>
 			</bs-modal>
 		</div>
+
+		<!-- Welcome view -->
+		<script type="text/x-template" id="view-welcome">
+			<div class="jumbotron">
+				<h1 class="display-3">Welcome!</h1>
+				<p class="lead">The game of Nim is a game where players must remove one or more objects from a pile. The losing player is the player to take the last item. In this variant you must take atleast one object, but may take up to half of the total objects remaining.</p>
+				<hr class="my-4">
+				<form v-on:submit.prevent="enterName">
+					<div class="form-group">
+						<label for="player-name">Enter your name below to get started!</label>
+						<input type="text" class="form-control" id="player-name">
+					</div>
+					<p class="lead">
+						<button class="btn btn-primary" type="submit">Play!</button>
+					</p>
+				</form>
+			</div>
+		</script>
+
+		<!-- Lobby view -->
+		<script type="text/x-template" id="view-lobby">
+			<div class="row h-100">
+				<div class="col">Chat pane</div>
+				<div class="col">Game list</div>
+			</div>
+		</script>
 
 		<!-- Custom templates -->
 		<script type="text/x-template" id="bootstrap-modal-template">
