@@ -9,6 +9,7 @@ ws.addEventListener('open', function(e) {
 
 ws.addEventListener('close', function(e) {
 	app.$data.webSocketConnected = false;
+	$('#network-error-modal').modal('show');
 });
 
 ws.addEventListener('message', e => {
@@ -33,10 +34,32 @@ var router = new VueRouter({
 });
 
 // --------------- //
+// Vue components //
+// ------------- //
+var bsModal = Vue.component('bs-modal', {
+	props: ["title", "buttons"],
+	template: '#bootstrap-modal-template',
+	methods: {
+		buttonCallback: function(eventName) {
+			if (eventName)
+				this.$emit(eventName);
+		}
+	}
+});
+
+// --------------- //
 // Setup main app //
 // ------------- //
 var app = new Vue({
 	router: router,
+	components: {
+		bsModal: bsModal
+	},
+
+	// Application methods
+	methods: {
+		reload: function() { window.location.reload(); }
+	},
 
 	// State for the application
 	data: {

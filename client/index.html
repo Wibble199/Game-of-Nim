@@ -14,8 +14,35 @@
 			</nav>
 
 			<router-view></router-view>
+
+			<bs-modal id="network-error-modal" title="Network Error" v-bind:buttons="[{label:'Reload', class:'btn-primary', callback: reload}]">
+				<p>You have been disconnected from the server.</p>
+			</bs-modal>
 		</div>
 
+		<!-- Custom templates -->
+		<script type="text/x-template" id="bootstrap-modal-template">
+			<div class="modal" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">{{title}}</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<slot></slot>
+						</div>
+						<div class="modal-footer">
+							<button v-for="btn in buttons" v-bind:class="['btn', btn.class || 'btn-default']" v-bind:data-dismiss="btn.close ? 'modal' : ''" v-on:click="btn.callback ? btn.callback() : null">{{btn.label}}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<!-- Import required JavaScript -->
 		<script src="vue.js"></script>
 		<script src="vue-router.js"></script>
 		<script src="bootstrap.min.js"></script>
