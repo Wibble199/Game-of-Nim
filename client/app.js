@@ -28,7 +28,7 @@ ws.addEventListener('message', e => {
 // Vue components //
 // ------------- //
 var bsModal = Vue.component('bs-modal', {
-	props: ["title", "buttons"],
+	props: ["title", "buttons", "closeButton"],
 	template: '#bootstrap-modal-template',
 	methods: {
 		buttonCallback: function(eventName) {
@@ -77,7 +77,13 @@ var app = new Vue({
 
 	// Application state data
 	data: {
-		userSetName: false
+		applicationLoading: false // Set if the app is doing something and should tell user
+	},
+
+	watch: {
+		applicationLoading: function(v) {
+			jQuery('#app-loading-modal').modal(v ? "show" : "hide");
+		}
 	},
 
 	// Application methods
