@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>WebSocket test</title>
-		<link rel="stylesheet" href="app.css" />
+		<meta charset="UTF-8" />
+		<title>Game of Nim &bull; Will Bennion (22925040)</title>
+		<link href="bootstrap.min.css" rel="stylesheet" />
+		<link href="app.css" rel="stylesheet" />
 	</head>
 	<body>
-		<h1>Socket test</h1>
-		<form id="server-message-form">
-			<input id="message-box" type="text" placeholder="Message to server">
-			<button type="submit">Send</button>
-		</form>
+		<div id="app">
+			<nav class="navbar navbar-dark bg-dark justify-content-between">
+				<div class="navbar-brand">Game of Nim</div>
+				<div>Will Bennion (22925040)</div>
+			</nav>
 
+			<router-view></router-view>
+		</div>
+
+		<script src="vue.js"></script>
+		<script src="vue-router.js"></script>
+		<script src="bootstrap.min.js"></script>
 		<script src="app.js"></script>
 	</body>
 </html>

@@ -1,19 +1,20 @@
+// ----------------- //
+// Setup web socket //
+// ----------------//
 var ws = new WebSocket("ws://" + location.host);
 
-$('#server-message-form').addEventListener('submit', function(e) {
-	e.preventDefault();
-	ws.send($('#message-box').value);
-	$('#message-box').value = "";
+ws.addEventListener('open', function(e) {
+	app.$data.webSocketConnected = true;
 });
 
-ws.addEventListener('open', e => {
-	console.log("Connection opened", e);
+ws.addEventListener('close', function(e) {
+	app.$data.webSocketConnected = false;
 });
 
 ws.addEventListener('message', e => {
 	var data = JSON.parse(e.data);
 	switch (data.event) { // Handle special events
-		case "heartbeat":
+		case "heartbeat": // Heartbeat from server
 			ws.send('{"event": "beat"}');
 			break;
 		default:
@@ -22,8 +23,24 @@ ws.addEventListener('message', e => {
 	}
 });
 
-ws.addEventListener('close', e => {
-	console.log("Connection closed", e);
+// --------------------- //
+// Setup route handling //
+// ------------------- //
+var router = new VueRouter({
+	routes: [
+		//{ path: "/", component: COMPONENT }	
+	]
 });
 
-function $(q) { return document.querySelector(q); }
+// --------------- //
+// Setup main app //
+// ------------- //
+var app = new Vue({
+	router: router,
+
+	// State for the application
+	data: {
+		webSocketConnected: false
+	}
+
+}).$mount('#app');
