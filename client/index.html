@@ -47,13 +47,60 @@
 		<!-- Lobby view -->
 		<script type="text/x-template" id="view-lobby">
 			<div class="row h-100">
-				<div class="col">Chat pane</div>
-				<div class="col">Game list</div>
+				<chat-panel></chat-panel>
+				<div class="col">
+					<div class="d-flex flex-column h-100">
+						<h4 class="m-2">Games</h4>
+						<ul class="list-group p-2 fg-1 game-lobby-list">
+							<li v-for="n in 3" class="list-group-item p-2 d-flex justify-content-between align-items-center">
+								Person{{(n * 2) - 1}} vs Person{{n * 2}}
+								<a href="#" class="btn btn-warning btn-sm">Join</a>
+							</li>
+						</ul>
+
+						<div class="p-2">
+							<a href="#" class="btn btn-primary btn-block">Create Game</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<!-- Game view -->
+		<script type="text/x-template" id="view-game">
+			<div class="row h-100">
+				<chat-panel></chat-panel>
+				<div class="col">
+					<h4 class="m-2">Game</h4>
+				</div>
 			</div>
 		</script>
 
 		<!-- Custom templates -->
-		<script type="text/x-template" id="bootstrap-modal-template">
+		<script type="text/x-template" id="template-chat-panel">
+			<div class="col-6">
+				<div class="d-flex flex-column h-100">
+					<h4 class="m-2">Chat</h4>
+					<div class="card m-2 p-2 fg-1">
+						<div class="card-body chat-history p-0">
+							<div v-for="msg in $store.state.messages" class="chat-message">
+								<span class="text-muted">[{{msg.time}}]</span>
+								<span class="text-danger font-weight-bold">{{msg.from}}:</span>
+								<span class="text-dark">{{msg.message}}</span>
+							</div>
+						</div>
+					</div>
+					<form class="p-2">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Message...">
+							<span class="input-group-btn"><button class="btn btn-primary" type="submit">Send</button></span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="template-bs-modal">
 			<div class="modal" tabindex="-1">
 				<div class="modal-dialog">
 					<div class="modal-content">

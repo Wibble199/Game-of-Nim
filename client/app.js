@@ -3,7 +3,12 @@
 // ---------------- //
 var store = new Vuex.Store({
 	state: {
-		username: ""
+		username: "",
+
+		messages: [
+			{ time: Date.now(), from: "Username", message: "Hello world this is a much longer sentence which will hopefully span multiple lines :D" },
+			{ time: Date.now(), from: "Username2", message: "Foo bar" }
+		]
 	},
 
 	mutators: {
@@ -52,9 +57,13 @@ function wsSend(data) {
 // --------------- //
 // Vue components //
 // ------------- //
+var chatPanel = Vue.component('chat-panel', {
+	template: '#template-chat-panel'
+});
+
 var bsModal = Vue.component('bs-modal', {
 	props: ["title", "buttons", "closeButton"],
-	template: '#bootstrap-modal-template',
+	template: '#template-bs-modal',
 	methods: {
 		buttonCallback: function(eventName) {
 			if (eventName)
@@ -81,13 +90,18 @@ var ViewLobby = {
 	template: '#view-lobby'
 };
 
+var ViewGame = {
+	template: '#view-game'
+};
+
 // --------------------- //
 // Setup route handling //
 // ------------------- //
 var router = new VueRouter({
 	routes: [
 		{ path: "/", component: ViewWelcome },
-		{ path: "/lobby", component: ViewLobby }	
+		{ path: "/lobby", component: ViewLobby },
+		{ path: "/game", component: ViewGame }
 	]
 });
 
@@ -98,7 +112,8 @@ var app = new Vue({
 	router: router,
 	store: store,
 	components: {
-		bsModal: bsModal
+		bsModal: bsModal,
+		chatPanel: chatPanel
 	},
 
 	// Application methods

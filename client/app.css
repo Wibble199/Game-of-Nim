@@ -9,3 +9,12 @@ html, body, #app {
 .main-container {
 	height: calc(100% - 85px);
 }
+
+.fg-1 {
+	flex-grow: 1;
+}
+
+.game-lobby-list, .chat-history {
+	overflow-y: scroll;
+	flex-basis: 0;
+}
