@@ -35,7 +35,7 @@
 				<form v-on:submit.prevent="enterName">
 					<div class="form-group">
 						<label for="player-name">Enter your name below to get started!</label>
-						<input type="text" class="form-control" id="player-name">
+						<input type="text" class="form-control" id="player-name" v-model="$store.state.username">
 					</div>
 					<p class="lead">
 						<button class="btn btn-primary" type="submit">Play!</button>
@@ -76,6 +76,7 @@
 
 		<!-- Import required JavaScript -->
 		<script src="vue.js"></script>
+		<script src="vuex.min.js"></script>
 		<script src="vue-router.js"></script>
 		<script src="bootstrap.min.js"></script>
 		<script src="app.js"></script>

@@ -1,28 +1,53 @@
+// ------------------ //
+// Global state data //
+// ---------------- //
+var store = new Vuex.Store({
+	state: {
+		username: ""
+	},
+
+	mutators: {
+		setProperty: function(state, prop, val) {
+			state[prop] = val;
+		}
+	}
+});
+	
 // ----------------- //
 // Setup web socket //
 // ----------------//
 var ws = new WebSocket("ws://" + location.host);
 
-ws.addEventListener('open', function(e) {
-	app.$data.webSocketConnected = true;
-});
-
 ws.addEventListener('close', function(e) {
-	app.$data.webSocketConnected = false;
 	$('#network-error-modal').modal('show');
 });
 
 ws.addEventListener('message', e => {
 	var data = JSON.parse(e.data);
+	console.log(data);
+	if (!data.event) return;
 	switch (data.event) { // Handle special events
 		case "heartbeat": // Heartbeat from server
 			ws.send('{"event": "beat"}');
 			break;
+
+		case "lobby-join":
+			router.replace("/lobby");
+			applicationLoading(false);
+			break;
+		
+		case "set":
+			store.commit("setProperty", data.prop, data.val);
+			break;
+
 		default:
-			// Do whatever
-			console.log("Message received", data.event);
+			console.log("Unknown event", data);
 	}
 });
+
+function wsSend(data) {
+	ws.send(JSON.stringify(data));
+}
 
 // --------------- //
 // Vue components //
@@ -46,8 +71,8 @@ var ViewWelcome = {
 
 	methods: {
 		enterName: function() {
-			// TODO: send to server
-			router.replace("/lobby");
+			applicationLoading(true);
+			wsSend({event: "lobby-join", username: store.state.username});
 		}
 	}
 };
@@ -71,24 +96,19 @@ var router = new VueRouter({
 // ------------- //
 var app = new Vue({
 	router: router,
+	store: store,
 	components: {
 		bsModal: bsModal
 	},
 
-	// Application state data
-	data: {
-		applicationLoading: false // Set if the app is doing something and should tell user
-	},
-
-	watch: {
-		applicationLoading: function(v) {
-			jQuery('#app-loading-modal').modal(v ? "show" : "hide");
-		}
-	},
-
 	// Application methods
 	methods: {
-		reload: function() { window.location.reload(); }
+		reload: function() { window.location.reload(); },
 	}
 
 }).$mount('#app');
+
+// Use to turn on/off loading dialog
+function applicationLoading(v) {
+	jQuery('#app-loading-modal').modal(v ? "show" : "hide");
+}

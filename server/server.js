@@ -67,7 +67,7 @@ socketServer.on('connection', socket => {
 					break;
 				
 				default: // Not a special message, so pass it on to the GameManager
-					manager.receiveMessage(msg, id);
+					manager.receiveMessage(json, id);
 			}
 			
 		} catch (ex) {

@@ -26,10 +26,27 @@ class GameManager {
 	/**
 	 * Handles receiving a message from a WebSocket.
 	 * @param {*} message JSON message that has been received.
-	 * @param {numb eventer} socketId ID number of the socket that sent the message.
+	 * @param {number} socketId ID number of the socket that sent the message.
 	 */
 	receiveMessage(message, socketId) {
+		switch (message.event) {
+			case "lobby-join":
+				this.sockets[socketId].username = message.username;
+				this.sendMessage({event: "lobby-join", success: true}, socketId);
+				break;
+		}
+	}
 
+	/**
+	 * Sends a message to a particular socket.
+	 * @param {*} message JSON message to be sent.
+	 * @param {number} socketId ID number of the socket to send the message to.
+	 */
+	sendMessage(message, socketId) {
+		console.log("Message", message, socketId);
+		if (!this.sockets[socketId]) return;
+		console.log("SENDING NOW");
+		this.sockets[socketId].socket.send(JSON.stringify(message));
 	}
 
 	/**
@@ -51,6 +68,7 @@ class WebSocketEntry {
 	constructor(ws) {
 		this.socket = ws;
 		this.id = -1;
+		this.username = "";
 		this.game = null;
 	}
 }
