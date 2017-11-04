@@ -84,7 +84,7 @@
 					<div class="card m-2 p-2 fg-1">
 						<div class="card-body chat-history p-0">
 							<div v-for="msg in $store.state.messages" class="chat-message">
-								<span class="text-muted">[{{msg.time}}]</span>
+								<span class="text-muted">[{{msg.time | date}}]</span>
 								<span class="text-danger font-weight-bold">{{msg.from}}:</span>
 								<span class="text-dark">{{msg.message}}</span>
 							</div>

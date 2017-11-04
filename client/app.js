@@ -58,7 +58,14 @@ function wsSend(data) {
 // Vue components //
 // ------------- //
 var chatPanel = Vue.component('chat-panel', {
-	template: '#template-chat-panel'
+	template: '#template-chat-panel',
+	filters: {
+		date: function (v) {
+			var d = new Date(v);
+			function td(v) { return (v < 10 ? "0" : "") + v; } // two digits
+			return td(d.getHours()) + ":" + td(d.getMinutes()) + ":" + td(d.getSeconds());
+		}
+	}
 });
 
 var bsModal = Vue.component('bs-modal', {
