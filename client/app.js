@@ -121,6 +121,7 @@ var router = new VueRouter({
 		{ path: "/game", component: ViewGame }
 	]
 });
+router.replace("/");
 
 // --------------- //
 // Setup main app //

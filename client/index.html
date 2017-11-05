@@ -35,7 +35,7 @@
 				<form v-on:submit.prevent="enterName">
 					<div class="form-group">
 						<label for="player-name">Enter your name below to get started!</label>
-						<input type="text" class="form-control" id="player-name" v-model="$store.state.username">
+						<input type="text" class="form-control" id="player-name" placeholder="What do we call you?" v-model="$store.state.username">
 					</div>
 					<p class="lead">
 						<button class="btn btn-primary" type="submit">Play!</button>
