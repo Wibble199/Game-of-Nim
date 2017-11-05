@@ -21,7 +21,7 @@
 				<p>One sec, we're working on it...</p>
 			</bs-modal>
 
-			<bs-modal id="network-error-modal" title="Network Error" v-bind:buttons="[{label:'Reload', class:'btn-primary', callback: reload}]" close-button="false" data-backdrop="static" data-keyboard="false">
+			<bs-modal id="network-error-modal" title="Network Error" v-bind:buttons="[{label:'Reload', class:'btn-primary', callback: reload}]" v-bind:close-button="false" data-backdrop="static" data-keyboard="false">
 				<p>You have been disconnected from the server.</p>
 			</bs-modal>
 		</div>
