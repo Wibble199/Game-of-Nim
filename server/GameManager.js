@@ -29,9 +29,16 @@ class GameManager {
 	 * @param {number} socketId ID number of the socket that sent the message.
 	 */
 	receiveMessage(message, socketId) {
+		var socket = this.sockets[socketId];
 		switch (message.event) {
+			case "chat-message":
+				if (!message.message) return;
+				this.sendChatMessage(socket.username, message.message);
+				break;
+
 			case "lobby-join":
-				this.sockets[socketId].username = message.username;
+				socket.username = message.username;
+				this.sendChatMessage("SYSTEM", `${message.username} has connected.`);
 				this.sendMessage({event: "lobby-join", success: true}, socketId);
 				break;
 		}
@@ -50,13 +57,40 @@ class GameManager {
 	}
 
 	/**
+	 * Sends a JSON message to all sockets currently connected.
+	 * @param {*} message JSON message to be sent to clients.
+	 */
+	broadcast(message) {
+		var messageStr = JSON.stringify(message);
+		this.sockets.forEach(wes =>
+			wes && wes.socket.send(messageStr)
+		);
+	}
+
+	/**
 	 * Handles a client disconnecting, whether purposeful or because of an error.
 	 * @param {number} socketId ID number of the socket that has disconnected.
 	 */
 	disconnectClient(socketId) {
 		if (!this.sockets[socketId]) return;
-		// close active game if there is one
+		// TODO: close active game if there is one
+		var user = this.sockets[socketId].username;
 		this.sockets[socketId] = null;
+		this.sendChatMessage("SYSTEM", `${user} has disconnected.`);
+	}
+
+
+	/**
+	 * Wrapper function to broadcast a chat message to all sockets.
+	 * @param {string} from The author of the message.
+	 * @param {string} message The chat message contents.
+	 */
+	sendChatMessage(from, message) {
+		this.broadcast({event: "chat-message", message: {
+			time: Date.now(),
+			from,
+			message
+		}});
 	}
 }
 
@@ -68,7 +102,7 @@ class WebSocketEntry {
 	constructor(ws) {
 		this.socket = ws;
 		this.id = -1;
-		this.username = "";
+		this.username = "User";
 		this.game = null;
 	}
 }

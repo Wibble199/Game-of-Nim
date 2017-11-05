@@ -5,10 +5,7 @@ var store = new Vuex.Store({
 	state: {
 		username: "",
 
-		messages: [
-			{ time: Date.now(), from: "Username", message: "Hello world this is a much longer sentence which will hopefully span multiple lines :D" },
-			{ time: Date.now(), from: "Username2", message: "Foo bar" }
-		]
+		messages: []
 	},
 
 	mutators: {
@@ -35,6 +32,10 @@ ws.addEventListener('message', e => {
 		case "heartbeat": // Heartbeat from server
 			ws.send('{"event": "beat"}');
 			break;
+		
+		case "chat-message":
+			store.state.messages.push(data.message);
+			break;
 
 		case "lobby-join":
 			router.replace("/lobby");
@@ -59,6 +60,15 @@ function wsSend(data) {
 // ------------- //
 var chatPanel = Vue.component('chat-panel', {
 	template: '#template-chat-panel',
+	data: function() { return {
+		messageInput: ""
+	};},
+	methods: {
+		submitMessage: function(e) {
+			wsSend({event: "chat-message", message: this.messageInput});
+			this.messageInput = "";
+		}
+	},
 	filters: {
 		date: function (v) {
 			var d = new Date(v);
