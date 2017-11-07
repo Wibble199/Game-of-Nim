@@ -60,15 +60,12 @@ socketServer.on('connection', socket => {
 			if (!json.event) // EVERYTHING should have an event property, throw an error if not
 				throw "No `event` property";
 			
-			// Check to see if there is any special handling for this message by the server
-			switch(json.event) {
-				case "beat": // Heartbeat response
-					clearTimeout(heartbeatTimeoutId); // Cancel the heartbeat timeout function
-					break;
-				
-				default: // Not a special message, so pass it on to the GameManager
-					manager.receiveMessage(json, id);
-			}
+			// Check to see if there is any special handling for this message at the core server level
+			var func = {
+				"beat": () => clearTimeout(heartbeatTimeoutId)
+			}[json.event];
+
+			func ? func(json) : manager.receiveMessage(json, id);
 			
 		} catch (ex) {
 			console.error("Invalid JSON received:", ex);

@@ -30,18 +30,8 @@ class GameManager {
 	 */
 	receiveMessage(message, socketId) {
 		var socket = this.sockets[socketId];
-		switch (message.event) {
-			case "chat-message":
-				if (!message.message) return;
-				this.sendChatMessage(socket.username, message.message);
-				break;
-
-			case "lobby-join":
-				socket.username = message.username;
-				this.sendChatMessage("SYSTEM", `${message.username} has connected.`);
-				this.sendMessage({event: "lobby-join", success: true}, socketId);
-				break;
-		}
+		var f = MessageHandlers[message.event];
+		f && f.call(this, message, socket);
 	}
 
 	/**
@@ -93,6 +83,21 @@ class GameManager {
 		}});
 	}
 }
+
+
+/** Handler dictionary for any received messages.
+ * @type {Object.<string,(any,socket WebSocketEntry)=>void>}
+*/
+const MessageHandlers = {
+	"chat-message"(message, socket) { message.message && this.sendChatMessage(socket.username, message.message) },
+
+	"lobby-join"(message, socket) {
+		socket.username = message.username;
+		this.sendChatMessage("SYSTEM", `${message.username} has connected.`);
+		this.sendMessage({ event: "lobby-join", success: true }, socket.id);
+	}
+};
+
 
 /** Structure to store metadata for a WebSocket. */
 class WebSocketEntry {

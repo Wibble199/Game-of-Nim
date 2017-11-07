@@ -26,30 +26,28 @@ ws.addEventListener('close', function(e) {
 
 ws.addEventListener('message', e => {
 	var data = JSON.parse(e.data);
-	console.log(data);
 	if (!data.event) return;
-	switch (data.event) { // Handle special events
-		case "heartbeat": // Heartbeat from server
-			ws.send('{"event": "beat"}');
-			break;
-		
-		case "chat-message":
-			store.state.messages.push(data.message);
-			break;
-
-		case "lobby-join":
-			router.replace("/lobby");
-			applicationLoading(false);
-			break;
-		
-		case "set":
-			store.commit("setProperty", data.prop, data.val);
-			break;
-
-		default:
-			console.log("Unknown event", data);
-	}
+	var f = MessageHandlers[data.event];
+	f && f(data);
 });
+
+/** Dictionary containing handlers for all WebSocket messages.
+ * @type {Object.<string,(any)=>void>} */
+var MessageHandlers = {
+	// Core functions
+	"heartbeat": function() {
+		wsSend({event: "beat"});
+	},
+
+	// Lobby functions
+	"lobby-join": function() {
+		router.replace("/lobby");
+		applicationLoading(false);
+	},
+	"chat-message": function(data) {
+		store.state.messages.push(data.message);
+	}
+};
 
 function wsSend(data) {
 	ws.send(JSON.stringify(data));
