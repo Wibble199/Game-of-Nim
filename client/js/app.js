@@ -102,7 +102,10 @@ var ViewWelcome = {
 };
 
 var ViewLobby = {
-	template: '#view-lobby'
+	template: '#view-lobby',
+	data: function() { return {
+		showCreateGamePopover: false
+	};},
 };
 
 var ViewGame = {

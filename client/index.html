@@ -49,17 +49,58 @@
 			<div class="row h-100">
 				<chat-panel></chat-panel>
 				<div class="col">
-					<div class="d-flex flex-column h-100">
+					<div class="d-flex flex-column h-100 position-relative">
 						<h4 class="m-2">Games</h4>
 						<ul class="list-group p-2 fg-1 game-lobby-list">
 							<li v-for="n in 3" class="list-group-item p-2 d-flex justify-content-between align-items-center">
 								Person{{(n * 2) - 1}} vs Person{{n * 2}}
-								<a href="#" class="btn btn-warning btn-sm">Join</a>
+								<button type="button" class="btn btn-info btn-sm">Join</button>
 							</li>
 						</ul>
 
+						<!-- Host game settings panel -->
+						<div class="card m-2 create-game-popover" v-bind:class="[showCreateGamePopover?'':'out']">
+							<div class="card-body">
+								<button type="button" class="close" v-on:click.prevent="showCreateGamePopover=false;"><span>&times;</span></button>
+								<h4 class="card-title">Create Game</h4>
+								<h6 class="card-subtitle mb-2 text-muted">Host a game for another player to join, or get some practice against the AI</h6>
+								<form>
+									<!-- Difficulty setting -->
+									<div class="form-group row">
+										<label class="col-sm-4 col-form-label">Difficulty</label>
+										<div class="btn-group" data-toggle="buttons">
+											<label class="btn btn-outline-primary active">
+												<input type="radio" name="difficultyOptions" id="difficult-opt-easy" checked> Easy
+											</label>
+											<label class="btn btn-outline-primary">
+												<input type="radio" name="difficultyOptions" id="difficult-opt-hard"> Hard
+											</label>
+										</div>
+									</div>
+									<!-- Opponent setting -->
+									<div class="form-group row">
+										<label class="col-sm-4 col-form-label">Oponent</label>
+										<div class="btn-group" data-toggle="buttons">
+											<label class="btn btn-outline-primary active">
+												<input type="radio" name="difficultyOptions" id="difficult-opt-easy" checked> Human
+											</label>
+											<label class="btn btn-outline-primary">
+												<input type="radio" name="difficultyOptions" id="difficult-opt-hard"> AI
+											</label>
+										</div>
+									</div>
+									<!-- Host button -->
+									<div class="form-group row justify-content-center">
+										<div class="col-sm-5">
+											<button type="submit" class="btn btn-block btn-info">Play</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+
 						<div class="p-2">
-							<a href="#" class="btn btn-primary btn-block">Create Game</a>
+							<button type="button" class="btn btn-primary btn-block" v-on:click.prevent="showCreateGamePopover=true;">Create Game</button>
 						</div>
 					</div>
 				</div>
