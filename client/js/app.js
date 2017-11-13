@@ -24,7 +24,7 @@ var store = new Vuex.Store({
 
 				} else {
 					// Update existing
-					var lobby = state.lobbies[index];
+					var lobby = state.lobbies[i];
 					lobby.player1 = serverMessage.player1;
 					lobby.player2 = serverMessage.player2;
 				}
