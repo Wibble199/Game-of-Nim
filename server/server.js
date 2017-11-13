@@ -2,7 +2,7 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const WebSocket = require('ws');
-const GameManager = require('./GameManager');
+const {GameManager} = require('./GameManager');
 
 const CLIENT_FILES = path.resolve(__dirname + "/../client");
 const HTTP_PORT = 8080;

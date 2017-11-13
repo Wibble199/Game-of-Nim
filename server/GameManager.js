@@ -5,7 +5,7 @@ class GameManager {
 	/**
 	 * Creates a new manager.
 	 */
-	constructor(wss) {
+	constructor() {
 		/** @type {WebSocketEntry[]} */
 		this.sockets = [];
 		/** @type {GameInstance[]} */
@@ -40,9 +40,7 @@ class GameManager {
 	 * @param {number} socketId ID number of the socket to send the message to.
 	 */
 	sendMessage(message, socketId) {
-		console.log("Message", message, socketId);
 		if (!this.sockets[socketId]) return;
-		console.log("SENDING NOW");
 		this.sockets[socketId].socket.send(JSON.stringify(message));
 	}
 
@@ -82,6 +80,26 @@ class GameManager {
 			message
 		}});
 	}
+
+
+	/** Sends a game-lobby status update to the target socket (or broadcasts update to all sockets if target is not provided).
+	 * @param {number} gameId The ID of the game whose status should be sent.
+	 * @param {number?} targetSocket The socket to update. Set to non-number to broadcast to all sockets.
+	*/
+	pushGameUpdate(gameId, targetSocket) {
+		var g = this.games[gameId]; // Shortcut to the game to broadcast
+		var payload = g !== null ? {
+			event: "game-status-update",
+			gameId,
+			player1: g.player1.username,
+			player2: g.player2 == null ? "Nobody" : g.player2.username
+		} : {
+			event: "game-status-update",
+			gameId,
+			gameClosed: true
+		};
+		typeof targetSocket == "number" ? this.sendMessage(payload, targetSocket) : this.broadcast(payload);
+	}
 }
 
 
@@ -89,12 +107,35 @@ class GameManager {
  * @type {Object.<string,(any,socket WebSocketEntry)=>void>}
 */
 const MessageHandlers = {
-	"chat-message"(message, socket) { message.message && this.sendChatMessage(socket.username, message.message) },
 
+// Lobby/chat functions
 	"lobby-join"(message, socket) {
 		socket.username = message.username;
 		this.sendChatMessage("SYSTEM", `${message.username} has connected.`);
 		this.sendMessage({ event: "lobby-join", success: true }, socket.id);
+		this.games.forEach((g, i) => g != null && this.pushGameUpdate(i)); // Push the game lobbies to the newly-connected client
+	},
+	"chat-message"(message, socket) { message.message && this.sendChatMessage(socket.username, message.message) },
+	
+// Game instance functions
+	"game-create"(message, socket) {
+		if (message.difficulty === undefined || message.opponentType === undefined)
+			this.sendMessage({ event: "game-create", success: false }, socket.id);
+		else {
+			var g = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard");
+			this.games.push(g);
+			this.pushGameUpdate(this.games.length - 1); // Push new lobby to all clients
+
+			socket.game = this.games.length - 1; // Assign the current socket to the relevant game
+			this.sendMessage({ event: "game-create", success: true }, socket.id);
+
+			if (message.opponentType == "ai") {
+				// TODO: Immediately start game
+			}
+		}
+	},
+	"game-join"(message, socket) {
+
 	}
 };
 
@@ -108,8 +149,14 @@ class WebSocketEntry {
 		this.socket = ws;
 		this.id = -1;
 		this.username = "User";
+		/** @type {number} */
 		this.game = null;
 	}
 }
 
-module.exports = GameManager;
+
+// Export
+module.exports = {
+	GameManager,
+	WebSocketEntry
+};

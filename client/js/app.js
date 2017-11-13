@@ -5,10 +5,39 @@ var store = new Vuex.Store({
 	state: {
 		username: "",
 
-		messages: []
+		messages: [],
+		lobbies: []
 	},
 
-	mutators: {
+	mutations: {
+		updateLobby: function(state, serverMessage) {
+			// Find existing lobby with same ID
+			var i;
+			for (i = 0; i < state.lobbies.length; i++)
+				if (state.lobbies[i].gameId == serverMessage.gameId)
+					break;
+			
+			if (i != state.lobbies.length) {
+				if (serverMessage.gameClosed) {
+					// Remove from array
+					state.lobbies.splice(i, 1);
+
+				} else {
+					// Update existing
+					var lobby = state.lobbies[index];
+					lobby.player1 = serverMessage.player1;
+					lobby.player2 = serverMessage.player2;
+				}
+			} else {
+				// If one was not found, add it
+				state.lobbies.push({
+					gameId: serverMessage.gameId,
+					player1: serverMessage.player1,
+					player2: serverMessage.player2
+				});
+			}
+		},
+
 		setProperty: function(state, prop, val) {
 			state[prop] = val;
 		}
@@ -46,6 +75,14 @@ var MessageHandlers = {
 	},
 	"chat-message": function(data) {
 		store.state.messages.push(data.message);
+	},
+	"game-create": function(date) {
+		applicationLoading(false);
+		//if (data.success)
+		//	TODO: go to a lobby-only screen (so user cannot see other lobbies)	
+	},
+	"game-status-update": function(data) {
+		store.commit('updateLobby', data);
 	}
 };
 
@@ -106,6 +143,17 @@ var ViewLobby = {
 	data: function() { return {
 		showCreateGamePopover: false
 	};},
+
+	methods: {
+		submitCreateGameLobby: function() {
+			applicationLoading(true);
+			wsSend({
+				event: "game-create",
+				difficulty: jQuery('[name="difficultyOptions"]:checked').val(),
+				opponentType: jQuery('[name="opponentOptions"]:checked').val()
+			});
+		}
+	}
 };
 
 var ViewGame = {

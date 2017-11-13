@@ -1,9 +1,11 @@
+const {WebSocketEntry} = require('./GameManager');
+
 /** Handles a single game of Nim. */
 class GameInstance {
 	/**
 	 * Creates a new instance to handle and run a single game of Nim.
-	 * @param {WebSocket} player1 The first player of the game.
-	 * @param {WebSocket} player2 The second player of the game (or null for computer).
+	 * @param {WebSocketEntry} player1 The first player of the game.
+	 * @param {WebSocketEntry} player2 The second player of the game (or null for computer).
 	 * @param {"easy"|"hard"} diff The difficulty of this game.
 	 */
 	constructor(player1, player2, diff) {
