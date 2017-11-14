@@ -5,7 +5,7 @@ var store = new Vuex.Store({
 	state: {
 		username: "",
 
-		inGameLobby: false,
+		inGameLobby: -1,
 
 		messages: [],
 		lobbies: []
@@ -81,7 +81,7 @@ var MessageHandlers = {
 	"game-create": function(data) {
 		applicationLoading(false);
 		if (data.success)
-			store.state.inGameLobby = true;
+			store.state.inGameLobby = data.gameId;
 	},
 	"game-status-update": function(data) {
 		store.commit('updateLobby', data);
@@ -164,6 +164,7 @@ var ViewLobby = {
 		},
 
 		joinGameLobby: function(gameId) {
+			if (gameId == store.state.inGameLobby) return; // Do nothing if we're already in the clicked lobby
 			applicationLoading(true);
 			wsSend({
 				event: "game-join",

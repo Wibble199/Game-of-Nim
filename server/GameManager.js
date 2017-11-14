@@ -134,11 +134,13 @@ const MessageHandlers = {
 			this.sendMessage({ event: "game-create", success: false }, socket.id);
 		else {
 			var newGame = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard");
-			this.games.push(newGame);
-			this.pushGameUpdate(this.games.length - 1); // Push new lobby to all clients
+			var newGameId = this.games.length;
 
-			socket.game = this.games.length - 1; // Assign the current socket to the relevant game
-			this.sendMessage({ event: "game-create", success: true }, socket.id);
+			this.games.push(newGame);
+			this.pushGameUpdate(newGameId); // Push new lobby to all clients
+
+			socket.game = newGameId; // Assign the current socket to the relevant game
+			this.sendMessage({ event: "game-create", success: true, gameId: newGameId }, socket.id);
 
 			if (message.opponentType == "ai")
 				newGame.start();
