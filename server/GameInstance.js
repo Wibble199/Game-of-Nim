@@ -12,9 +12,34 @@ class GameInstance {
 		if (player1 == null) throw "Invalid value for player1";
 
 		this.difficulty = diff;
-		this.player1 = player1;
-		this.player2 = player2;
+		this.players = [player1, player2];
+		this.inProgress = false;
+	}
+
+	/**
+	 * Starts the game.
+	 */
+	start() {
+		var startPayload = { event: "game-start" };
+		this.sendMessage(startPayload, 0);
+		this.sendMessage(startPayload, 1);
+	}
+
+	/**
+	 * Sends a message to a particular player.
+	 * @param {*} message JSON message to be sent.
+	 * @param {number} player Zero-indexed player to send the message to (will silently do nothing if AI player is specified).
+	 */
+	sendMessage(message, player) {
+		this.players[player] && this.players[player].socket.send(JSON.stringify(message));
 	}
 };
 
-module.exports = GameInstance;
+/** Handler dictionary for any received messages (called from the GameManager class).
+ * @type {Object.<string,(any,socket WebSocketEntry)=>void>}
+*/
+const GameInstanceMessageHandlers = {
+};
+
+// Export
+module.exports = {GameInstance, GameInstanceMessageHandlers};

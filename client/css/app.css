@@ -31,5 +31,6 @@ html, body, #app {
 
 .create-game-popover.out {
 	opacity: 0;
+	z-index: 1;
 	transform: translateY(100%);
 }

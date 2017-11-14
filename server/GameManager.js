@@ -1,4 +1,4 @@
-const GameInstance = require('./GameInstance');
+const {GameInstance, GameInstanceMessageHandlers} = require('./GameInstance');
 
 /** Manages creation and messages for GameInstances. */
 class GameManager {
@@ -30,8 +30,17 @@ class GameManager {
 	 */
 	receiveMessage(message, socketId) {
 		var socket = this.sockets[socketId];
+
+		// Attempt to handle the message in the manager
 		var f = MessageHandlers[message.event];
-		f && f.call(this, message, socket);
+		if (f)
+			f.call(this, message, socket);
+
+		// Otherwise try to pass the message to a relevant GameInstance
+		else if (socket.game !== null && this.games[socket.game]) {
+			f = GameInstanceMessageHandlers[message.event];
+			f && f.call(this.games[socket.game], message, socket);
+		}
 	}
 
 	/**
@@ -91,8 +100,8 @@ class GameManager {
 		var payload = g !== null ? {
 			event: "game-status-update",
 			gameId,
-			player1: g.player1.username,
-			player2: g.player2 == null ? "Nobody" : g.player2.username
+			player1: g.players[0].username,
+			player2: g.players[1] == null ? "Nobody" : g.players[1].username
 		} : {
 			event: "game-status-update",
 			gameId,
@@ -115,27 +124,38 @@ const MessageHandlers = {
 		this.sendMessage({ event: "lobby-join", success: true }, socket.id);
 		this.games.forEach((g, i) => g != null && this.pushGameUpdate(i)); // Push the game lobbies to the newly-connected client
 	},
-	"chat-message"(message, socket) { message.message && this.sendChatMessage(socket.username, message.message) },
+	"chat-message"(message, socket) {
+		message.message && this.sendChatMessage(socket.username, message.message)
+	},
 	
 // Game instance functions
 	"game-create"(message, socket) {
 		if (message.difficulty === undefined || message.opponentType === undefined)
 			this.sendMessage({ event: "game-create", success: false }, socket.id);
 		else {
-			var g = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard");
-			this.games.push(g);
+			var newGame = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard");
+			this.games.push(newGame);
 			this.pushGameUpdate(this.games.length - 1); // Push new lobby to all clients
 
 			socket.game = this.games.length - 1; // Assign the current socket to the relevant game
 			this.sendMessage({ event: "game-create", success: true }, socket.id);
 
-			if (message.opponentType == "ai") {
-				// TODO: Immediately start game
-			}
+			if (message.opponentType == "ai")
+				newGame.start();
 		}
 	},
 	"game-join"(message, socket) {
+		/** @type {GameInstance} */
+		var g = this.games[message.id];
+		if (g && !g.inProgress && g.players[1] === null) { // If there is a game with this id, it's not in progress and there is a space for player2, allow the user to join		
+			socket.game = message.id;
+			g.players[1] = socket;
+			this.pushGameUpdate(message.id); // Update lobby to all clients
+			this.sendMessage({ event: "game-join", success: true }, socket.id);
+			g.start(); // since there are now two players, start the game
 
+		} else
+			this.sendMessage({ event: "game-join", success: false }, socket.id);
 	}
 };
 

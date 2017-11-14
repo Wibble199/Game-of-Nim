@@ -5,6 +5,8 @@ var store = new Vuex.Store({
 	state: {
 		username: "",
 
+		inGameLobby: false,
+
 		messages: [],
 		lobbies: []
 	},
@@ -76,13 +78,19 @@ var MessageHandlers = {
 	"chat-message": function(data) {
 		store.state.messages.push(data.message);
 	},
-	"game-create": function(date) {
+	"game-create": function(data) {
 		applicationLoading(false);
-		//if (data.success)
-		//	TODO: go to a lobby-only screen (so user cannot see other lobbies)	
+		if (data.success)
+			store.state.inGameLobby = true;
 	},
 	"game-status-update": function(data) {
 		store.commit('updateLobby', data);
+	},
+
+	// Game functions
+	"game-start": function(data) {
+		applicationLoading(false);
+		router.replace("/game");
 	}
 };
 
@@ -147,10 +155,19 @@ var ViewLobby = {
 	methods: {
 		submitCreateGameLobby: function() {
 			applicationLoading(true);
+			this.$data.showCreateGamePopover = false;
 			wsSend({
 				event: "game-create",
 				difficulty: jQuery('[name="difficultyOptions"]:checked').val(),
 				opponentType: jQuery('[name="opponentOptions"]:checked').val()
+			});
+		},
+
+		joinGameLobby: function(gameId) {
+			applicationLoading(true);
+			wsSend({
+				event: "game-join",
+				id: gameId
 			});
 		}
 	}
