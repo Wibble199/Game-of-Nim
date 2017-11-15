@@ -119,6 +119,20 @@
 				<chat-panel></chat-panel>
 				<div class="col">
 					<h4 class="m-2">Game</h4>
+
+					<p>There are {{$store.state.marbles}} marble(s).</p>
+					<p>It is {{$store.state.yourTurn?"":"not "}}your turn.</p>
+					<form v-on:submit.prevent="playTurn">
+						<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
+							<div class="form-group row">
+								<label for="marble-remove-amount" class="col-sm-6 col-form-label">Marbles to remove:</label>
+								<div class="col-sm-6">
+									<input type="number" min="1" max="40" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
+								</div>
+							</div>
+							<button type="submit" class="btn btn-primary">Play turn</button>
+						</fieldset>
+					</form>
 				</div>
 			</div>
 		</script>

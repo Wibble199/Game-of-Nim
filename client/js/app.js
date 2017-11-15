@@ -3,12 +3,16 @@
 // ---------------- //
 var store = new Vuex.Store({
 	state: {
+		// Lobby-related vars
 		username: "",
-
 		inGameLobby: -1,
-
 		messages: [],
-		lobbies: []
+		lobbies: [],
+
+		// Game-related vars
+		marbles: 0,
+		yourTurn: false, // yourTurn is not the same as canPlay: It can be your turn but you may
+		canPlay: false // not be able to play if you are waiting on a message to go to the server.
 	},
 
 	mutations: {
@@ -38,6 +42,11 @@ var store = new Vuex.Store({
 					player2: serverMessage.player2
 				});
 			}
+		},
+
+		updateGameState: function(state, data) {
+			state.marbles = data.marbles;
+			state.yourTurn = state.canPlay = data.yourTurn;
 		},
 
 		setProperty: function(state, prop, val) {
@@ -91,6 +100,19 @@ var MessageHandlers = {
 	"game-start": function(data) {
 		applicationLoading(false);
 		router.replace("/game");
+		store.commit('updateGameState', data);
+	},
+	"game-update": function(data) {
+		store.commit('updateGameState', data);
+	},
+	"play-turn": function(data) {
+		if (!data.success) {
+			store.state.canPlay = true;
+			// TODO: show error message to user (data.reason)
+		}
+	},
+	"game-over": function(data) {
+		alert("Game over, you " + (data.win ? "won." : "lost."));
 	}
 };
 
@@ -175,7 +197,18 @@ var ViewLobby = {
 };
 
 var ViewGame = {
-	template: '#view-game'
+	template: '#view-game',
+
+	data: function() { return {
+		marblesToRemove: 1
+	};},
+
+	methods: {
+		playTurn: function() {
+			wsSend({ event: "play-turn", marbles: this.$data.marblesToRemove });
+			store.state.canPlay = false; // Prevent the user from making a second move before the server has responded
+		}
+	}
 };
 
 // --------------------- //
