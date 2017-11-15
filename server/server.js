@@ -55,21 +55,21 @@ socketServer.on('connection', socket => {
 
 	// Handle receiving messages from this client
 	socket.on('message', msg => {
+		let json;
 		try {
-			let json = JSON.parse(msg);
+			json = JSON.parse(msg);
 			if (!json.event) // EVERYTHING should have an event property, throw an error if not
 				throw "No `event` property";
-			
-			// Check to see if there is any special handling for this message at the core server level
-			var func = {
-				"beat": () => clearTimeout(heartbeatTimeoutId)
-			}[json.event];
-
-			func ? func(json) : manager.receiveMessage(json, id);
-			
 		} catch (ex) {
 			console.error("Invalid JSON received:", ex);
 		}
+			
+		// Check to see if there is any special handling for this message at the core server level
+		var func = {
+			"beat": () => clearTimeout(heartbeatTimeoutId)
+		}[json.event];
+
+		func ? func(json) : manager.receiveMessage(json, id);
 	});
 
 	// Handle the client closing (disconnect)
