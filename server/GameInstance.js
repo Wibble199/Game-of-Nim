@@ -23,7 +23,7 @@ class GameInstance {
 
 	/** Gets the maximum amount of marbles allowed to be removed based on the current count. */
 	get maxMarbleRemoveAmount() {
-		return Math.ceil(this.marbles / 2);
+		return Math.max(Math.floor(this.marbles / 2), 1);
 	}
 
 	/**

@@ -112,6 +112,7 @@ var MessageHandlers = {
 		}
 	},
 	"game-over": function(data) {
+		store.state.yourTurn = store.state.canPlay = false;
 		alert("Game over, you " + (data.win ? "won." : "lost."));
 	}
 };

@@ -127,7 +127,7 @@
 							<div class="form-group row">
 								<label for="marble-remove-amount" class="col-sm-6 col-form-label">Marbles to remove:</label>
 								<div class="col-sm-6">
-									<input type="number" min="1" max="40" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
+									<input type="number" min="1" v-bind:max=" Math.max(Math.floor($store.state.marbles / 2), 1)" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
 								</div>
 							</div>
 							<button type="submit" class="btn btn-primary">Play turn</button>
