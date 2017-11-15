@@ -1,19 +1,29 @@
 const {WebSocketEntry} = require('./GameManager');
 
+/** The numbers that the AI will attempt to lower the marble count to. */
+const AI_TARGET_NUMBERS = [1,2,3,4,5,6].map(n => Math.pow(2, n) - 1);
+
 /** Handles a single game of Nim. */
 class GameInstance {
 	/**
 	 * Creates a new instance to handle and run a single game of Nim.
 	 * @param {WebSocketEntry} player1 The first player of the game.
-	 * @param {WebSocketEntry} player2 The second player of the game (or null for computer).
+	 * @param {WebSocketEntry} player2 The second player of the game (or null for AI).
 	 * @param {"easy"|"hard"} diff The difficulty of this game.
+	 * @param {boolean} useAI Whether to use an AI player in place of player 2.
 	 */
-	constructor(player1, player2, diff) {
+	constructor(player1, player2, diff, useAI) {
 		if (player1 == null) throw "Invalid value for player1";
 
 		this.difficulty = diff;
 		this.players = [player1, player2];
+		this.aiOpponent = useAI;
 		this.inProgress = false;
+	}
+
+	/** Gets the maximum amount of marbles allowed to be removed based on the current count. */
+	get maxMarbleRemoveAmount() {
+		return Math.ceil(this.marbles / 2);
 	}
 
 	/**
@@ -29,6 +39,10 @@ class GameInstance {
 
 		// Send data to the players
 		this.sendGameUpdate("game-start");
+
+		// If playing with an AI turn, and it is AI to play first, play the AI move
+		if (this.currentPlayer == 1 && this.aiOpponent)
+			this.playAITurn();
 	}
 
 	/** Plays a player's turn.
@@ -43,7 +57,7 @@ class GameInstance {
 		}
 
 		// Guard to ensure we are getting an integer value and the player is removing the correct amount of marbles (atleast 1, at most half)
-		if (typeof marbleAmount != "number" || marbleAmount % 1 != 0 || marbleAmount < 1 || marbleAmount > Math.ceil(this.marbles / 2)) {
+		if (typeof marbleAmount != "number" || marbleAmount % 1 != 0 || marbleAmount < 1 || marbleAmount > this.maxMarbleRemoveAmount) {
 			this.sendMessage({ event: "play-turn", success: false, reason: "You attempted to take an invalid amount of marbles." }, player);
 			return;
 		}
@@ -59,7 +73,37 @@ class GameInstance {
 
 		} else {
 			this.sendGameUpdate("game-update");
+
+			// If player 2 is an AI, invoke the AI turn
+			if (this.aiOpponent)
+				this.playAITurn();
 		}
+	}
+
+	/** Plays an AI's turn.
+	 * The AI attempts to make the marble count a power of 2 minus 1. If it can't, it will make a random legal move. */
+	playAITurn() {
+		/* Loop through all the predtermined numbers the AI should end it's turn on and see if there are any that are in
+		a playable range (atleast one below the current marble count [you must take atleast one marble] and no more
+		than half the current marble count [cannot take more than half marbles]).
+		`some` function will run a consumer function on each item in an array and return true if atleast one of the
+		calls to the consumer function returns true (and not run on any subsequent items in the array). */
+		var marblesToTake;
+		var foundTarget = AI_TARGET_NUMBERS.some(n => {
+			// If we find a valid target amount of marbles, 
+			if (n <= this.marbles - 1 && n >= this.marbles - this.maxMarbleRemoveAmount) {
+				marblesToTake = this.marbles - n;
+				return true;
+			}
+			return false;
+		});
+
+		// If we did not find a valid target amount of marbles, play any random legal move.
+		if (!foundTarget)
+			marblesToTake = Math.floor(Math.random() * this.maxMarbleRemoveAmount + 1);
+
+		// Perform the action after a delay to give the impression the AI is 'thinking'.
+		setTimeout(() => this.playTurn(1, marblesToTake), 1500);
 	}
 
 	/** Sends an update containing the player whose turn it is and the number of marbles to both players.

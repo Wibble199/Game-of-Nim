@@ -101,7 +101,7 @@ class GameManager {
 			event: "game-status-update",
 			gameId,
 			player1: g.players[0].username,
-			player2: g.players[1] == null ? "Nobody" : g.players[1].username
+			player2: g.aiOpponent ? "AI" : (g.players[1] == null ? "Nobody" : g.players[1].username)
 		} : {
 			event: "game-status-update",
 			gameId,
@@ -133,7 +133,7 @@ const MessageHandlers = {
 		if (message.difficulty === undefined || message.opponentType === undefined)
 			this.sendMessage({ event: "game-create", success: false }, socket.id);
 		else {
-			var newGame = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard");
+			var newGame = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard", message.opponentType == "ai");
 			var newGameId = this.games.length;
 
 			this.games.push(newGame);
@@ -149,7 +149,7 @@ const MessageHandlers = {
 	"game-join"(message, socket) {
 		/** @type {GameInstance} */
 		var g = this.games[message.id];
-		if (g && !g.inProgress && g.players[1] === null) { // If there is a game with this id, it's not in progress and there is a space for player2, allow the user to join		
+		if (g && !g.aiOpponent && !g.inProgress && g.players[1] === null) { // If there is a game with this id, it's not in progress and there is a space for player2, allow the user to join		
 			socket.game = message.id;
 			g.players[1] = socket;
 			this.pushGameUpdate(message.id); // Update lobby to all clients
