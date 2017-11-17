@@ -12,7 +12,8 @@ var store = new Vuex.Store({
 		// Game-related vars
 		marbles: 0,
 		yourTurn: false, // yourTurn is not the same as canPlay: It can be your turn but you may
-		canPlay: false // not be able to play if you are waiting on a message to go to the server.
+		canPlay: false, // not be able to play if you are waiting on a message to go to the server.
+		lastErrorMessage: ""
 	},
 
 	mutations: {
@@ -110,7 +111,7 @@ var MessageHandlers = {
 	"play-turn": function(data) {
 		if (!data.success) {
 			store.state.canPlay = true;
-			// TODO: show error message to user (data.reason)
+			store.state.lastErrorMessage = data.reason;
 		}
 	},
 	"game-over": function(data) {

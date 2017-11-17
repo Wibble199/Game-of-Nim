@@ -120,6 +120,11 @@
 				<div class="col">
 					<h4 class="m-2">Game</h4>
 
+					<div class="alert alert-dismissible alert-danger m-2" v-if="$store.state.lastErrorMessage">
+						<button type="button" class="close" v-on:click.prevent="$store.state.lastErrorMessage=''">&times;</button>
+						<u>Error:</u> {{$store.state.lastErrorMessage}}
+					</div>
+
 					<p>There are {{$store.state.marbles}} marble(s).</p>
 					<p>It is {{$store.state.yourTurn?"":"not "}}your turn.</p>
 					<form v-on:submit.prevent="playTurn">
