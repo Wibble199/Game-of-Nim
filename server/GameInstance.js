@@ -54,6 +54,7 @@ class GameInstance {
 	terminate(terminatingPlayer) {
 		var terminatingPlayerIndex = this.players.indexOf(terminatingPlayer);
 		this.currentPlayer = -1; // Not any player's turn
+		this.gameState = "game-over";
 
 		// Send a message to the user that didn't initiate the termination to inform them it has happened
 		this.sendMessage({ event: "game-terminate" }, terminatingPlayerIndex == 0 ? 1 : 0);
@@ -82,6 +83,7 @@ class GameInstance {
 
 		// If there are no marbles left, the game is over
 		if (this.marbles == 0) {
+			this.gameState = "game-over";
 			this.sendMessage({ event: "game-over", win: player != 0 }, 0); // Player wins if they are NOT the player who just made the move
 			this.sendMessage({ event: "game-over", win: player != 1 }, 1);
 
@@ -145,7 +147,10 @@ class GameInstance {
 const GameInstanceMessageHandlers = {
 	"play-turn"(message, socket) {
 		var playerIndex = this.players.indexOf(socket);
-		this.playTurn(playerIndex, message.marbles);
+		if (this.gameState == "in-game")
+			this.playTurn(playerIndex, message.marbles);
+		else
+			this.sendMessage({ event: "play-turn", success: false, reason: "This game is not currently active." }, playerIndex)
 	}
 };
 
