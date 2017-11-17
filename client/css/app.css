@@ -34,3 +34,8 @@ html, body, #app {
 	z-index: 1;
 	transform: translateY(100%);
 }
+
+.lobby-waiting-paragraph {
+	position: relative;
+    top: 7px;
+}

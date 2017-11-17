@@ -104,8 +104,9 @@
 						</div>
 
 						<div class="card text-white bg-dark m-2 p-2" v-if="$store.state.inGameLobby!=-1">
-							<div class="card-body p-1">
-								Waiting on another player&hellip;
+							<div class="card-body p-1 clearfix" style="height:41px;">
+								<p class="lobby-waiting-paragraph float-left">Waiting on another player&hellip;</p>
+								<button type="button" class="btn btn-sm btn-danger float-right" v-on:click.prevent="cancelLobbyWaiting">Stop waiting</button>
 							</div>
 						</div>
 					</div>

@@ -123,9 +123,11 @@ var MessageHandlers = {
 		store.state.yourTurn = store.state.canPlay = false;
 		alert("Game over, you " + (data.win ? "won." : "lost."));
 	},
-	"game-forfeit": function(data) {
-		if (data.success)
+	"game-leave": function(data) {
+		if (data.success) {
+			store.state.inGameLobby = -1;
 			router.replace("/lobby");
+		}
 	},
 	"game-terminate": function(_) {
 		store.state.yourTurn = store.state.canPlay = false;
@@ -210,6 +212,10 @@ var ViewLobby = {
 				event: "game-join",
 				id: gameId
 			});
+		},
+
+		cancelLobbyWaiting: function() {
+			wsSend({ event: "game-leave" });
 		}
 	}
 };
@@ -227,7 +233,7 @@ var ViewGame = {
 			store.state.canPlay = false; // Prevent the user from making a second move before the server has responded
 		},
 		forfeitGame: function() {
-			wsSend({ event: "game-forfeit" });
+			wsSend({ event: "game-leave" });
 		}
 	}
 };

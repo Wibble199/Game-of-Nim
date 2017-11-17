@@ -175,7 +175,7 @@ const MessageHandlers = {
 		} else
 			this.sendMessage({ event: "game-join", success: false }, socket.id);
 	},
-	"game-forfeit"(message, socket) {
+	"game-leave"(message, socket) {
 		// Terminate game, remove and announce update to clients
 		this.games[socket.game].terminate(socket);
 		this.games[socket.game] = null;
@@ -183,7 +183,7 @@ const MessageHandlers = {
 
 		// Clear the socket's game and respond
 		socket.game = null;
-		this.sendMessage({ event: "game-forfeit", success: true }, socket.id);
+		this.sendMessage({ event: "game-leave", success: true }, socket.id);
 	}
 };
 
