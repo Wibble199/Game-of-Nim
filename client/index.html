@@ -54,7 +54,7 @@
 						<ul class="list-group p-2 fg-1 game-lobby-list">
 							<li v-for="lobby in $store.state.lobbies" class="list-group-item p-2 d-flex justify-content-between align-items-center">
 								{{lobby.player1}} vs {{lobby.player2}}
-								<button type="button" class="btn btn-info btn-sm" v-bind:class="{disabled:$store.state.inGameLobby==lobby.gameId}" v-on:click.prevent="joinGameLobby(lobby.gameId)">Join</button>
+								<button type="button" class="btn btn-info btn-sm" v-bind:class="{disabled:$store.state.inGameLobby==lobby.gameId || lobby.gameState!='in-lobby'}" v-on:click.prevent="joinGameLobby(lobby.gameId)">Join</button>
 							</li>
 						</ul>
 

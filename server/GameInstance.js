@@ -18,7 +18,9 @@ class GameInstance {
 		this.difficulty = diff;
 		this.players = [player1, player2];
 		this.aiOpponent = useAI;
-		this.inProgress = false;
+
+		/** @type {"in-lobby"|"in-game"|"game-over"} */
+		this.gameState = "in-lobby";
 	}
 
 	/** Gets the maximum amount of marbles allowed to be removed based on the current count. */
@@ -38,6 +40,7 @@ class GameInstance {
 		this.currentPlayer = Math.round(Math.random());
 
 		// Send data to the players
+		this.gameState = "in-game";
 		this.sendGameUpdate("game-start");
 
 		// If playing with an AI turn, and it is AI to play first, play the AI move

@@ -17,30 +17,32 @@ var store = new Vuex.Store({
 	},
 
 	mutations: {
-		updateLobby: function(state, serverMessage) {
+		updateLobby: function(state, msg) {
 			// Find existing lobby with same ID
 			var i;
 			for (i = 0; i < state.lobbies.length; i++)
-				if (state.lobbies[i].gameId == serverMessage.gameId)
+				if (state.lobbies[i].gameId == msg.gameId)
 					break;
 			
 			if (i != state.lobbies.length) {
-				if (serverMessage.gameClosed) {
+				if (msg.gameClosed) {
 					// Remove from array
 					state.lobbies.splice(i, 1);
 
 				} else {
 					// Update existing
 					var lobby = state.lobbies[i];
-					lobby.player1 = serverMessage.player1;
-					lobby.player2 = serverMessage.player2;
+					lobby.player1 = msg.player1;
+					lobby.player2 = msg.player2;
+					lobby.gameState = msg.gameState;
 				}
 			} else {
 				// If one was not found, add it
 				state.lobbies.push({
-					gameId: serverMessage.gameId,
-					player1: serverMessage.player1,
-					player2: serverMessage.player2
+					gameId: msg.gameId,
+					player1: msg.player1,
+					player2: msg.player2,
+					gameState: msg.gameState
 				});
 			}
 		},
@@ -92,6 +94,9 @@ var MessageHandlers = {
 		applicationLoading(false);
 		if (data.success)
 			store.state.inGameLobby = data.gameId;
+	},
+	"game-join": function(data) {
+		applicationLoading(false);
 	},
 	"game-status-update": function(data) {
 		store.commit('updateLobby', data);
