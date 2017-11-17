@@ -164,16 +164,34 @@ const MessageHandlers = {
 	},
 	"game-join"(message, socket) {
 		/** @type {GameInstance} */
-		var g = this.games[message.id];
-		if (g && !g.aiOpponent && g.gameState == "in-lobby" && g.players[1] === null) { // If there is a game with this id, it's not in progress and there is a space for player2, allow the user to join		
+		var gameToJoin = this.games[message.id];
+		if (gameToJoin && !gameToJoin.aiOpponent && gameToJoin.gameState == "in-lobby" && gameToJoin.players[1] === null) { // If there is a game with this id, it's not in progress and there is a space for player2, allow the user to join		
+			
+			// Check to see if the user is currently in a game or lobby
+			/** @type {GameInstance} */
+			var origGame = this.games[socket.game];
+			if (origGame) {
+				if (origGame.gameState == "in-lobby") {
+					// Original game is in lobby, so close the game
+					this.games[socket.game] = null;
+					this.pushGameUpdate(socket.game);
+					
+				} else {
+					// Game is still in progress, so disallow leaving
+					this.sendMessage({ event: "game-join", success: false, reason: "You cannot join a new game while you are currently in a game." }, socket.id);
+					return;
+				}
+			}
+
+			// Actually add the user to the game they've elected to join
 			socket.game = message.id;
-			g.players[1] = socket;
-			g.start(); // since there are now two players, start the game
+			gameToJoin.players[1] = socket;
+			gameToJoin.start(); // since there are now two players, start the game
 			this.pushGameUpdate(message.id); // Update lobby to all clients
 			this.sendMessage({ event: "game-join", success: true }, socket.id);
 
 		} else
-			this.sendMessage({ event: "game-join", success: false }, socket.id);
+			this.sendMessage({ event: "game-join", success: false, reason: "Tried to join an invalid game." }, socket.id);
 	},
 	"game-leave"(message, socket) {
 		// Terminate game, remove and announce update to clients
