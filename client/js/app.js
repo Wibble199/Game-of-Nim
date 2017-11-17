@@ -115,6 +115,10 @@ var MessageHandlers = {
 		store.state.yourTurn = store.state.canPlay = false;
 		alert("Game over, you " + (data.win ? "won." : "lost."));
 	},
+	"game-forfeit": function(data) {
+		if (data.success)
+			router.replace("/lobby");
+	},
 	"game-terminate": function(_) {
 		store.state.yourTurn = store.state.canPlay = false;
 		alert("The other player forfeited");
@@ -213,6 +217,9 @@ var ViewGame = {
 		playTurn: function() {
 			wsSend({ event: "play-turn", marbles: this.$data.marblesToRemove });
 			store.state.canPlay = false; // Prevent the user from making a second move before the server has responded
+		},
+		forfeitGame: function() {
+			wsSend({ event: "game-forfeit" });
 		}
 	}
 };

@@ -173,6 +173,16 @@ const MessageHandlers = {
 
 		} else
 			this.sendMessage({ event: "game-join", success: false }, socket.id);
+	},
+	"game-forfeit"(message, socket) {
+		// Terminate game, remove and announce update to clients
+		this.games[socket.game].terminate(socket);
+		this.games[socket.game] = null;
+		this.pushGameUpdate(socket.game);
+
+		// Clear the socket's game and respond
+		socket.game = null;
+		this.sendMessage({ event: "game-forfeit", success: true }, socket.id);
 	}
 };
 
