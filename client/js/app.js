@@ -114,6 +114,11 @@ var MessageHandlers = {
 	"game-over": function(data) {
 		store.state.yourTurn = store.state.canPlay = false;
 		alert("Game over, you " + (data.win ? "won." : "lost."));
+	},
+	"game-terminate": function(_) {
+		store.state.yourTurn = store.state.canPlay = false;
+		alert("The other player forfeited");
+		router.replace("/lobby");
 	}
 };
 

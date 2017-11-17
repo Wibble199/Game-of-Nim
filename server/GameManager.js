@@ -70,10 +70,25 @@ class GameManager {
 	 */
 	disconnectClient(socketId) {
 		if (!this.sockets[socketId]) return;
-		// TODO: close active game if there is one
+		
+		// Close active game if there is one
+		var gameIndex = this.sockets[socketId].game;
+		if (gameIndex != null) {
+			this.games[gameIndex].terminate(this.sockets[socketId]);
+			this.games[gameIndex] = null;
+		}
+
+		// Store username for use later
 		var user = this.sockets[socketId].username;
+
+		// Delete reference to the WebSocketEntry
 		this.sockets[socketId] = null;
-		this.sendChatMessage("SYSTEM", `${user} has disconnected.`);
+		
+		// These have to be called AFTER setting the socket entry to be null otherwise it
+		// attempts to broadcast to a closed socket.
+		this.sendChatMessage("SYSTEM", `${user} has disconnected.`); // Announce disconnection to other clients
+		if (gameIndex != null) // Announce game lobby update to other clients
+			this.pushGameUpdate(gameIndex);
 	}
 
 

@@ -45,6 +45,17 @@ class GameInstance {
 			this.playAITurn();
 	}
 
+	/** Ends a game. To be called when a user leaves or disconnects.
+	 * @param {WebSocketEntry} terminatingPlayer The player that has ended the
+	*/
+	terminate(terminatingPlayer) {
+		var terminatingPlayerIndex = this.players.indexOf(terminatingPlayer);
+		this.currentPlayer = -1; // Not any player's turn
+
+		// Send a message to the user that didn't initiate the termination to inform them it has happened
+		this.sendMessage({ event: "game-terminate" }, terminatingPlayerIndex == 0 ? 1 : 0);
+	}
+
 	/** Plays a player's turn.
 	 * @param {number} player The player who played the move.
 	 * @param {number} marbleAmount The amount of marbles the player moved.
