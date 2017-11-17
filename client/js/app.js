@@ -101,6 +101,8 @@ var MessageHandlers = {
 		applicationLoading(false);
 		router.replace("/game");
 		store.commit('updateGameState', data);
+		// Now we've joined, reset game lobby flag so that however the game ends we can create a new game
+		store.state.inGameLobby = -1;
 	},
 	"game-update": function(data) {
 		store.commit('updateGameState', data);
