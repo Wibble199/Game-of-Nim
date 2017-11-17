@@ -137,7 +137,7 @@ class GameInstance {
 };
 
 /** Handler dictionary for any received messages (called from the GameManager class).
- * @type {Object.<string,(any,socket WebSocketEntry)=>void>}
+ * @type {Object.<string,(message:any,socket:WebSocketEntry)=>void>}
 */
 const GameInstanceMessageHandlers = {
 	"play-turn"(message, socket) {

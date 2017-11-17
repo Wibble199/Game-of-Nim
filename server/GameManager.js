@@ -128,7 +128,7 @@ class GameManager {
 
 
 /** Handler dictionary for any received messages.
- * @type {Object.<string,(any,socket WebSocketEntry)=>void>}
+ * @type {Object.<string,(message:any,socket:WebSocketEntry)=>void>}
 */
 const MessageHandlers = {
 
