@@ -61,8 +61,8 @@ Sent when the client wishes to create a new game instance.
 
 Property name|Property type|Description
 -|-|-
-difficulty|*"easy"|"hard"*|Whether to start a game with up to 20 marbles (easy) or up to 100 (hard).
-opponentType|*"ai"|"human"*|Whether the player wishes to play against another human or the server-side AI.
+difficulty|*"easy"\|"hard"*|Whether to start a game with up to 20 marbles (easy) or up to 100 (hard).
+opponentType|*"ai"\|"human"*|Whether the player wishes to play against another human or the server-side AI.
 
 #### When sent by server
 Sent to a client to confirm that the newly requested game has been created or that it has failed to be created.
