@@ -283,6 +283,11 @@ var app = new Vue({
 
 }).$mount('#app');
 
+// Setup tooltips
+$(function () {
+	$('[data-toggle="tooltip"]').tooltip()
+})
+
 // Use to turn on/off loading dialog
 function applicationLoading(v) {
 	jQuery('#app-loading-modal').modal(v ? "show" : "hide");
