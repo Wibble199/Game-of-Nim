@@ -21,6 +21,7 @@ var store = new Vuex.Store({
 		
 		// Mobile related
 		newMessages: 0,
+		gameNotification: false,
 		mobileShowGamePanel: true
 	},
 
@@ -62,6 +63,18 @@ var store = new Vuex.Store({
 
 		setProperty: function(state, prop, val) {
 			state[prop] = val;
+		},
+
+		/** Increments the unread message counter on mobile devices. */
+		mobileAddMessageNotification: function(state) {
+			if (state.mobileShowGamePanel)
+				state.newMessages++;
+		},
+
+		/** Sets the flag to show the game update notification for mobile devices. */
+		mobileAddGameNotification: function(state) {
+			if (!state.mobileShowGamePanel)
+				state.gameNotification = true;
 		}
 	}
 });
@@ -97,19 +110,21 @@ var MessageHandlers = {
 	},
 	"chat-message": function(data) {
 		store.state.messages.push(data.message);
-		if (store.state.mobileShowGamePanel)
-			store.state.newMessages++;
+		store.commit('mobileAddMessageNotification');
 	},
 	"game-create": function(data) {
 		applicationLoading(false);
-		if (data.success)
+		if (data.success) {
 			store.state.inGameLobby = data.gameId;
+			store.commit('mobileAddGameNotification');
+		}
 	},
 	"game-join": function(data) {
 		applicationLoading(false);
 	},
 	"game-status-update": function(data) {
 		store.commit('updateLobby', data);
+		store.commit('mobileAddGameNotification');
 	},
 
 	// Game functions
@@ -120,9 +135,12 @@ var MessageHandlers = {
 		store.state.gameState = "in-game";
 		// Now we've joined, reset game lobby flag so that however the game ends we can create a new game
 		store.state.inGameLobby = -1;
+
+		store.commit('mobileAddGameNotification');
 	},
 	"game-update": function(data) {
 		store.commit('updateGameState', data);
+		store.commit('mobileAddGameNotification');
 	},
 	"play-turn": function(data) {
 		if (!data.success) {
@@ -136,6 +154,7 @@ var MessageHandlers = {
 		store.state.lastWinner = data.win;
 		store.state.rematchStatus = data.ai ? "The AI is always ready for a rematch." : "Your opponent has not voted on whether they want to rematch.";
 		store.state.allowRematchVote = true;
+		store.commit('mobileAddGameNotification');
 	},
 	"game-leave": function(data) {
 		if (data.success) {
@@ -146,6 +165,7 @@ var MessageHandlers = {
 	"game-terminate": function(_) {
 		store.state.yourTurn = store.state.canPlay = false;
 		store.state.gameState = "opponent-forfeit";
+		store.commit('mobileAddGameNotification');
 	},
 	"rematch-vote": function(data) {
 		store.state.rematchStatus = "Your opponent has " + (data.opponentVote ? "voted to rematch." : "chosen not to rematch.");

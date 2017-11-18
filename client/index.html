@@ -206,7 +206,10 @@
 					Messages
 					<span class="badge badge-pill badge-danger" v-if="$store.state.newMessages">{{$store.state.newMessages}}</span>
 				</a>
-				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" v-bind:class="{active: $store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=true">Game</a>
+				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" v-bind:class="{active: $store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=true;$store.state.gameNotification=false">
+					Game
+					<span class="badge badge-pill badge-danger" v-if="$store.state.gameNotification">!</span>
+				</a>
 			</div>
 		</script>
 
