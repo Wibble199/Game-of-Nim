@@ -4,6 +4,12 @@ html, body, #app {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .main-container {
@@ -54,6 +60,13 @@ html, body, #app {
 
 	.mobile-switch-panel.switch {
 		left: calc(-100% + 15px);
+	}
+
+	.btn-group-sm-mobile > .btn {
+		padding: 0.5rem 1rem;
+		font-size: 10px;
+		line-height: 1.5;
+		border-radius: 0;
 	}
 }
 
