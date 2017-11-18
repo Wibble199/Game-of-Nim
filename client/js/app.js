@@ -8,7 +8,7 @@ var store = new Vuex.Store({
 		inGameLobby: -1,
 		messages: [],
 		lobbies: [],
-
+		
 		// Game-related vars
 		gameState: "",
 		marbles: 0,
@@ -17,7 +17,11 @@ var store = new Vuex.Store({
 		lastErrorMessage: "",
 		lastWinner: false, // whether or not this user won the last game
 		rematchStatus: "",
-		allowRematchVote: true
+		allowRematchVote: true,
+		
+		// Mobile related
+		newMessages: 0,
+		mobileShowGamePanel: true
 	},
 
 	mutations: {
@@ -93,6 +97,8 @@ var MessageHandlers = {
 	},
 	"chat-message": function(data) {
 		store.state.messages.push(data.message);
+		if (store.state.mobileShowGamePanel)
+			store.state.newMessages++;
 	},
 	"game-create": function(data) {
 		applicationLoading(false);
@@ -172,6 +178,10 @@ var chatPanel = Vue.component('chat-panel', {
 			return td(d.getHours()) + ":" + td(d.getMinutes()) + ":" + td(d.getSeconds());
 		}
 	}
+});
+
+var mobileNav = Vue.component('mobile-nav', {
+	template: '#template-mobile-nav'
 });
 
 var bsModal = Vue.component('bs-modal', {
@@ -273,7 +283,8 @@ var app = new Vue({
 	store: store,
 	components: {
 		bsModal: bsModal,
-		chatPanel: chatPanel
+		chatPanel: chatPanel,
+		mobileNav: mobileNav
 	},
 
 	// Application methods

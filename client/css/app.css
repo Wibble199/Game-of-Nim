@@ -40,6 +40,23 @@ html, body, #app {
     top: 7px;
 }
 
+/* Mobile optimisations */
+@media (max-width: 575px) {
+	.w-sm-200 {
+		width: 200% !important;
+	}
+
+	.mobile-switch-panel {
+		position: relative;
+		left: 15px;
+		transition: left 300ms ease-in-out;
+	}
+
+	.mobile-switch-panel.switch {
+		left: calc(-100% + 15px);
+	}
+}
+
 /* Bitbucket header icon */
 .bitbucket-icon {
 	display: inline-block;
