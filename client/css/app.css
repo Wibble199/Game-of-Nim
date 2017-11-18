@@ -60,6 +60,11 @@ html, body, #app {
 		height: calc(100% - 45px);
 	}
 
+	.mobile-nav {
+		border: 8px solid #DEDEDE;
+    	border-bottom: 0;
+	}
+
 	.mobile-switch-panel {
 		position: relative;
 		left: 15px;
