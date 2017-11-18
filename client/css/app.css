@@ -52,6 +52,14 @@ html, body, #app {
 		width: 200% !important;
 	}
 
+	.navbar {
+		padding: 4px 16px;
+	}
+
+	.main-container {
+		height: calc(100% - 45px);
+	}
+
 	.mobile-switch-panel {
 		position: relative;
 		left: 15px;
