@@ -68,6 +68,38 @@ html, body, #app {
 		line-height: 1.5;
 		border-radius: 0;
 	}
+
+	.btn-mobile-nav {
+		position: relative;
+		background-color: #DEDEDE;
+		transition: background-color 0s;
+	}
+
+	.btn-mobile-nav::after {
+		content: " ";
+		display: block;
+		position: absolute;
+		bottom: 0; left: 50%;
+		width: 0%;
+		border-bottom: 4px solid #343A40;
+		transform: translate(-50%);
+		transition: width 0s;
+	}
+
+	.btn-mobile-nav.active {
+		background-color: #FFF;
+		transition: background-color 300ms ease-in-out;
+	}
+
+	.btn-mobile-nav.active::after {
+		width: 90%;
+		transition: width 300ms ease-in-out;
+	}
+
+	.btn-mobile-nav:focus {
+		-webkit-box-shadow: none !important;
+		box-shadow: none !important;
+	}
 }
 
 /* Bitbucket header icon */

@@ -202,11 +202,11 @@
 
 		<script type="text/x-template" id="template-mobile-nav">
 			<div class="d-flex d-sm-none btn-group w-100">
-				<a href="javascript:void" class="btn btn-secondary" style="flex:1 1 0" v-bind:class="{active: !$store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=false;$store.state.newMessages=0">
+				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" v-bind:class="{active: !$store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=false;$store.state.newMessages=0">
 					Messages
 					<span class="badge badge-pill badge-danger" v-if="$store.state.newMessages">{{$store.state.newMessages}}</span>
 				</a>
-				<button type="button" class="btn btn-secondary" style="flex:1 1 0" v-bind:class="{active: $store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=true">Game</button>
+				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" v-bind:class="{active: $store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=true">Game</a>
 			</div>
 		</script>
 
