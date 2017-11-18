@@ -39,3 +39,31 @@ html, body, #app {
 	position: relative;
     top: 7px;
 }
+
+/* Bitbucket header icon */
+.bitbucket-icon {
+	display: inline-block;
+	position: relative;
+	
+	background-image: url(../img/bitbucket.grey.png);
+}
+
+.bitbucket-icon::after {
+	display: block;
+	position: absolute;
+	top: 0; left: 0;
+
+	content: " ";
+	background-image: url(../img/bitbucket.png);
+	opacity: 0;
+
+	transition: opacity 200ms linear;
+}
+
+.bitbucket-icon, .bitbucket-icon::after {
+	width: 18px;
+	height: 18px;
+}
+
+.bitbucket-icon:hover { text-decoration: none; }
+.bitbucket-icon:hover::after { opacity: 1; }
