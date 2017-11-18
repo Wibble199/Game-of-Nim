@@ -146,8 +146,10 @@ const MessageHandlers = {
 	
 // Game instance functions
 	"game-create"(message, socket) {
-		if (message.difficulty === undefined || message.opponentType === undefined)
-			this.sendMessage({ event: "game-create", success: false }, socket.id);
+		if (socket.game != null) // Ensure that client cannot create a game while being in one
+			this.sendMessage({ event: "game-create", success: false, reason: "Client already in a game." }, socket.id);
+		else if (message.difficulty === undefined || message.opponentType === undefined)
+			this.sendMessage({ event: "game-create", success: false, reason: "Required parameter missing." }, socket.id);
 		else {
 			var newGame = new GameInstance(socket, null, message.difficulty == "easy" ? "easy" : "hard", message.opponentType == "ai");
 			var newGameId = this.games.length;
