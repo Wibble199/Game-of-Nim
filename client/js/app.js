@@ -36,7 +36,7 @@ var store = new Vuex.Store({
 					lobby.player2 = msg.player2;
 					lobby.gameState = msg.gameState;
 				}
-			} else {
+			} else if (!msg.gameClosed) {
 				// If one was not found, add it
 				state.lobbies.push({
 					gameId: msg.gameId,
