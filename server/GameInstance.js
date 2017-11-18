@@ -18,7 +18,6 @@ class GameInstance {
 		this.difficulty = diff;
 		this.players = [player1, player2];
 		this.aiOpponent = useAI;
-		this.rematchVote = 0;
 
 		/** @type {"in-lobby"|"in-game"|"game-over"} */
 		this.gameState = "in-lobby";
@@ -165,9 +164,17 @@ const GameInstanceMessageHandlers = {
 	"rematch-vote"(message, socket) {
 		if (this.gameState != "game-over") return; // Cannot vote rematch if the game's not ended
 		var playerIndex = this.players.indexOf(socket);
+
+		// Add the metadata that this socket has voted for a rematch
+		socket.rematchVote = true;
 	
-		if (++this.rematchVote == (this.aiOpponent ? 1 : 2)) { // If enough players have voted (only 1 if opponent is AI, 2 for 2-human-player)
-			this.rematchVote = 0; // Reset count for next vote
+		// If both players (in 2-player) or the single player (in AI mode) voted to rematch
+		if (this.players[0].rematchVote && (this.aiOpponent || this.players[1].rematchVote)) {
+			 // Reset votes for next rematch vote
+			 this.players[0].rematchVote = false;
+			if (!this.aiOpponent) this.players[1].rematchVote = false;
+			
+			// Restart the game
 			this.start();
 		}
 

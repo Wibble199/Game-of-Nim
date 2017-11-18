@@ -219,6 +219,7 @@ class WebSocketEntry {
 		this.username = "User";
 		/** @type {number} */
 		this.game = null;
+		this.rematchVote = false;
 	}
 }
 
