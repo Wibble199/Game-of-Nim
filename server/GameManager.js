@@ -194,8 +194,10 @@ const MessageHandlers = {
 			this.sendMessage({ event: "game-join", success: false, reason: "Tried to join an invalid game." }, socket.id);
 	},
 	"game-leave"(message, socket) {
-		// Terminate game, remove and announce update to clients
-		this.games[socket.game].terminate(socket);
+		var g = this.games[socket.game];
+		
+		// Terminate and remove game and announce update to clients
+		if (g) g.terminate(socket);
 		this.games[socket.game] = null;
 		this.pushGameUpdate(socket.game);
 

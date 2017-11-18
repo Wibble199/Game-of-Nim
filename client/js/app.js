@@ -10,10 +10,14 @@ var store = new Vuex.Store({
 		lobbies: [],
 
 		// Game-related vars
+		gameState: "",
 		marbles: 0,
 		yourTurn: false, // yourTurn is not the same as canPlay: It can be your turn but you may
 		canPlay: false, // not be able to play if you are waiting on a message to go to the server.
-		lastErrorMessage: ""
+		lastErrorMessage: "",
+		lastWinner: false, // whether or not this user won the last game
+		rematchStatus: "",
+		allowRematchVote: true
 	},
 
 	mutations: {
@@ -107,6 +111,7 @@ var MessageHandlers = {
 		applicationLoading(false);
 		router.replace("/game");
 		store.commit('updateGameState', data);
+		store.state.gameState = "in-game";
 		// Now we've joined, reset game lobby flag so that however the game ends we can create a new game
 		store.state.inGameLobby = -1;
 	},
@@ -121,7 +126,10 @@ var MessageHandlers = {
 	},
 	"game-over": function(data) {
 		store.state.yourTurn = store.state.canPlay = false;
-		alert("Game over, you " + (data.win ? "won." : "lost."));
+		store.state.gameState = "game-over";
+		store.state.lastWinner = data.win;
+		store.state.rematchStatus = data.ai ? "The AI is always ready for a rematch." : "Your opponent has not voted on whether they want to rematch.";
+		store.state.allowRematchVote = true;
 	},
 	"game-leave": function(data) {
 		if (data.success) {
@@ -131,8 +139,11 @@ var MessageHandlers = {
 	},
 	"game-terminate": function(_) {
 		store.state.yourTurn = store.state.canPlay = false;
-		alert("The other player forfeited");
-		router.replace("/lobby");
+		store.state.gameState = "opponent-forfeit";
+	},
+	"rematch-vote": function(data) {
+		store.state.rematchStatus = "Your opponent has " + (data.opponentVote ? "voted to rematch." : "chosen not to rematch.");
+		store.state.allowRematchVote = data.opponentVote;
 	}
 };
 
@@ -232,8 +243,12 @@ var ViewGame = {
 			wsSend({ event: "play-turn", marbles: this.$data.marblesToRemove });
 			store.state.canPlay = false; // Prevent the user from making a second move before the server has responded
 		},
-		forfeitGame: function() {
+		gameLeave: function() {
 			wsSend({ event: "game-leave" });
+		},
+		voteRematch: function() {
+			store.state.rematchStatus = "You have voted to rematch. Waiting on your opponent.";
+			wsSend({ event: "rematch-vote", vote: true });
 		}
 	}
 };

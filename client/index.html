@@ -121,11 +121,33 @@
 				<div class="col">
 					<h4 class="m-2">Game</h4>
 
+					<!-- Error dialog -->
 					<div class="alert alert-dismissible alert-danger m-2" v-if="$store.state.lastErrorMessage">
 						<button type="button" class="close" v-on:click.prevent="$store.state.lastErrorMessage=''">&times;</button>
 						<u>Error:</u> {{$store.state.lastErrorMessage}}
 					</div>
 
+					<!-- Rematch dialog -->
+					<div class="card text-dark m-2" v-bind:class="[$store.state.lastWinner ? 'bg-success' : 'bg-danger']" v-if="$store.state.gameState=='game-over'">
+						<div class="card-body">
+							<h4 class="card-title">{{$store.state.lastWinner ? "Congratulations, you won!" : "Game over, you lost"}}</h4>
+							<p class="card-text">Would you like to play a rematch?</p>
+							<p class="card-text">{{$store.state.rematchStatus}}</p>
+							<button type="button" class="btn btn-outline-primary" v-on:click.prevent="gameLeave">Return to Lobby</button>
+							<button type="button" class="btn btn-outline-primary" v-on:click.prevent="voteRematch" v-bind:disabled="!$store.state.allowRematchVote">Rematch</button>
+						</div>
+					</div>
+
+					<!-- Opponent forfeit dialog -->
+					<div class="card text-dark bg-warning m-2" v-if="$store.state.gameState=='opponent-forfeit'">
+						<div class="card-body">
+							<h4 class="card-title">You win by default</h4>
+							<p class="card-text">Your opponent forfeited the match and you have won.</p>
+							<button type="button" class="btn btn-outline-primary" v-on:click.prevent="gameLeave">Return to Lobby</button>
+						</div>
+					</div>
+
+					<!-- Actual game render -->
 					<p>There are {{$store.state.marbles}} marble(s).</p>
 					<p>It is {{$store.state.yourTurn?"":"not "}}your turn.</p>
 					<form v-on:submit.prevent="playTurn">
@@ -139,7 +161,7 @@
 							<button type="submit" class="btn btn-primary">Play turn</button>
 						</fieldset>
 					</form>
-					<button type="button" class="btn btn-danger btn-sm" v-on:click.prevent="forfeitGame">Forfeit</button>
+					<button type="button" class="btn btn-danger btn-sm" v-on:click.prevent="gameLeave">Forfeit</button>
 				</div>
 			</div>
 		</script>

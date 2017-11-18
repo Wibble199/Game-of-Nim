@@ -18,6 +18,7 @@ class GameInstance {
 		this.difficulty = diff;
 		this.players = [player1, player2];
 		this.aiOpponent = useAI;
+		this.rematchVote = 0;
 
 		/** @type {"in-lobby"|"in-game"|"game-over"} */
 		this.gameState = "in-lobby";
@@ -28,9 +29,7 @@ class GameInstance {
 		return Math.max(Math.floor(this.marbles / 2), 1);
 	}
 
-	/**
-	 * Starts the game.
-	 */
+	/** Initialises and starts the game. */
 	start() {
 		// Randomly choose amount of marbles
 		var max = this.difficulty == "easy" ? 20 : 100;
@@ -53,11 +52,20 @@ class GameInstance {
 	*/
 	terminate(terminatingPlayer) {
 		var terminatingPlayerIndex = this.players.indexOf(terminatingPlayer);
-		this.currentPlayer = -1; // Not any player's turn
-		this.gameState = "game-over";
+		var nonTerminatingPlayerIndex = terminatingPlayerIndex == 0 ? 1 : 0;
 
-		// Send a message to the user that didn't initiate the termination to inform them it has happened
-		this.sendMessage({ event: "game-terminate" }, terminatingPlayerIndex == 0 ? 1 : 0);
+		if (this.gameState == "game-over") {
+			// If the game is over and a user terminates, they do not want a rematch. Tell their opponent.
+			this.sendMessage({ event: "rematch-vote", opponentVote: false }, nonTerminatingPlayerIndex);
+
+		} else {
+			// If the game is still in progress, the player has abandoned
+			this.currentPlayer = -1; // Not any player's turn
+			this.gameState = "game-over";
+
+			// Send a message to the user that didn't initiate the termination to inform them it has happened
+			this.sendMessage({ event: "game-terminate" }, nonTerminatingPlayerIndex);
+		}
 	}
 
 	/** Plays a player's turn.
@@ -84,8 +92,9 @@ class GameInstance {
 		// If there are no marbles left, the game is over
 		if (this.marbles == 0) {
 			this.gameState = "game-over";
-			this.sendMessage({ event: "game-over", win: player != 0 }, 0); // Player wins if they are NOT the player who just made the move
-			this.sendMessage({ event: "game-over", win: player != 1 }, 1);
+			var basePayload = { event: "game-over", ai: this.aiOpponent };
+			this.sendMessage(Object.assign({ win: player != 0 }, basePayload), 0); // Player wins if they are NOT the player who just made the move
+			this.sendMessage(Object.assign({ win: player != 1 }, basePayload), 1);
 
 		} else {
 			this.sendGameUpdate("game-update");
@@ -127,8 +136,8 @@ class GameInstance {
 	*/
 	sendGameUpdate(evtType) {
 		var basePayload = { event: evtType, marbles: this.marbles };
-		this.sendMessage(Object.assign({}, basePayload, { yourTurn: this.currentPlayer == 0 }), 0);
-		this.sendMessage(Object.assign({}, basePayload, { yourTurn: this.currentPlayer == 1 }), 1);
+		this.sendMessage(Object.assign({ yourTurn: this.currentPlayer == 0 }, basePayload), 0);
+		this.sendMessage(Object.assign({ yourTurn: this.currentPlayer == 1 }, basePayload), 1);
 	}
 
 	/**
@@ -151,6 +160,19 @@ const GameInstanceMessageHandlers = {
 			this.playTurn(playerIndex, message.marbles);
 		else
 			this.sendMessage({ event: "play-turn", success: false, reason: "This game is not currently active." }, playerIndex)
+	},
+
+	"rematch-vote"(message, socket) {
+		if (this.gameState != "game-over") return; // Cannot vote rematch if the game's not ended
+		var playerIndex = this.players.indexOf(socket);
+	
+		if (++this.rematchVote == (this.aiOpponent ? 1 : 2)) { // If enough players have voted (only 1 if opponent is AI, 2 for 2-human-player)
+			this.rematchVote = 0; // Reset count for next vote
+			this.start();
+		}
+
+		// Update the other player with what this player has voted.
+		this.sendMessage({ event: "rematch-vote", opponentVote: true }, playerIndex == 0 ? 1 : 0);
 	}
 };
 
