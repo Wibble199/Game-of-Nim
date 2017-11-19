@@ -61,16 +61,16 @@ html, body, #app {
 	transform: translate(-50%, -50%);
 }
 
+.marble-text-display { /* For text that may appear above marbles on small screens */
+	z-index: 1;
+	text-shadow: 0 0 3px #FFF, 0 0 5px #FFF, 0 0 9px #FFF;
+}
+
 .marble {
 	display: inline-block;
 	width: 32px;
 	height: 32px;
 	background-size: contain;
-}
-
-.fade-out {
-	opacity: 0;
-	transition: opacity 300ms ease-in-out;
 }
 
 .marble.marble-blue { background-image: url(../img/marble-blue.png); }
@@ -82,6 +82,11 @@ html, body, #app {
 
 .marble-row:not(:first-child) {
 	margin-top: -10px;
+}
+
+.fade-out {
+	opacity: 0;
+	transition: opacity 300ms ease-in-out;
 }
 
 /* Mobile optimisations */
@@ -151,6 +156,8 @@ html, body, #app {
 		-webkit-box-shadow: none !important;
 		box-shadow: none !important;
 	}
+
+	.marble-display { transform: translate(-50%, -50%) scale(0.7); }
 }
 
 /* Bitbucket header icon */
