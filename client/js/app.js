@@ -131,8 +131,8 @@ var MessageHandlers = {
 	"game-create": function(msg, state) {
 		// Hide loading message and if successfully created lobby then show the waiting box
 		applicationLoading(false);
-		if (data.success) {
-			store.state.inGameLobby = data.gameId;
+		if (msg.success) {
+			state.inGameLobby = msg.gameId;
 			store.commit('mobileAddGameNotification');
 		}
 	},
