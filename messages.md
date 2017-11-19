@@ -61,8 +61,8 @@ Sent when the client wishes to create a new game instance.
 
 Property name|Property type|Description
 -|-|-
-difficulty|*"easy"|"hard"*|Whether to start a game with up to 20 marbles (easy) or up to 100 (hard).
-opponentType|*"ai"|"human"*|Whether the player wishes to play against another human or the server-side AI.
+difficulty|*"easy"&#124;"hard"*|Whether to start a game with up to 20 marbles (easy) or up to 100 (hard).
+opponentType|*"ai"&#124;"human"*|Whether the player wishes to play against another human or the server-side AI.
 
 #### When sent by server
 Sent to a client to confirm that the newly requested game has been created or that it has failed to be created.
@@ -102,7 +102,7 @@ gameId|*number*|The game ID to update
 gameClosed|*true*|*(Not always present)* Only present if the game was open and has now been closed.
 player1|*string*|*(Only present if gameClosed is not)* The name of the first player in the game.
 player2|*string*|*(Only present if gameClosed is not)* The name of the second player in the game.
-gameState|*"in-lobby"\|"in-game"\|"game-over"*|*(Only present if gameClosed is not)* The current state of the game.
+gameState|*"in-lobby"&#124;"in-game"&#124;"game-over"*|*(Only present if gameClosed is not)* The current state of the game.
 
 ## game-start
 #### When sent by client

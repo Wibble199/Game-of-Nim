@@ -13,7 +13,7 @@
 				<div class="navbar-brand">Game of Nim</div>
 				<div class="d-none d-sm-block">
 					Will Bennion (22925040)
-					<a class="bitbucket-icon" href="https://bitbucket.org/wibble199/game-of-nim" target="_blank" data-toggle="tooltip" data-placement="left" title="Check out the Bitbucket repository">&nbsp;</a>
+					<a class="bitbucket-icon" href="https://bitbucket.org/wibble199/game-of-nim" target="_blank" data-toggle="tooltip" data-placement="left" title="View project on Bitbucket">&nbsp;</a>
 				</div>
 			</nav>
 
@@ -56,7 +56,7 @@
 					<chat-panel></chat-panel>
 					<div class="col">
 						<div class="d-flex flex-column h-100 position-relative">
-							<h4 class="m-2">Games</h4>
+							<h4 class="m-2">Available Games</h4>
 							<ul class="list-group p-2 fg-1 game-lobby-list">
 								<li v-for="lobby in $store.state.lobbies" class="list-group-item p-2 d-flex justify-content-between align-items-center">
 									{{lobby.player1}} vs {{lobby.player2}}
@@ -127,7 +127,7 @@
 				<mobile-nav></mobile-nav>
 				<div class="row h-100 w-sm-200 mobile-switch-panel" v-bind:class="{switch: $store.state.mobileShowGamePanel}">
 					<chat-panel></chat-panel>
-					<div class="col">
+					<div class="col d-flex flex-column h-100">
 						<h4 class="m-2">Game</h4>
 
 						<!-- Error dialog -->
@@ -156,21 +156,29 @@
 							</div>
 						</div>
 
-						<!-- Actual game render -->
-						<p>There are {{$store.state.marbles}} marble(s).</p>
-						<p>It is {{$store.state.yourTurn?"":"not "}}your turn.</p>
+					<!-- Actual game render -->
+					<div class="d-flex flex-column fg-1 p-2 position-relative" v-if="$store.state.gameState=='in-game'">
+						<div class="fg-1 marble-display-container">
+							<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles"></marble-display>
+						</div>
+
+						<h3 class="text-center">{{$store.state.marbles}} marbles remain.</h3>
+						<h4 class="text-center">It is {{$store.state.yourTurn?"":"not "}}your turn.</h4>
+
+						<div style="height:44px"></div> <!-- Spacer -->
+
 						<form v-on:submit.prevent="playTurn">
 							<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
-								<div class="form-group row">
-									<label for="marble-remove-amount" class="col-sm-6 col-form-label">Marbles to remove:</label>
-									<div class="col-sm-6">
-										<input type="number" min="1" v-bind:max=" Math.max(Math.floor($store.state.marbles / 2), 1)" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
-									</div>
+								<label for="marble-remove-amount" class="d-block text-center">How many marbles would you like to remove?</label>
+								<div class="input-group">
+									<input id="marble-remove-amount" type="number" min="1" v-bind:max="Math.max(Math.floor($store.state.marbles/2),1)" class="form-control" placeholder="Enter a number…" style="z-index:2 !important" v-model.number="marblesToRemove">
+									<span class="input-group-btn">
+										<button type="submit" class="btn btn-primary">Play turn</button>
+									</span>
 								</div>
-								<button type="submit" class="btn btn-primary">Play turn</button>
 							</fieldset>
 						</form>
-						<button type="button" class="btn btn-danger btn-sm" v-on:click.prevent="gameLeave">Forfeit</button>
+						<button type="button" class="btn btn-danger btn-sm position-absolute forfeit-button" v-on:click.prevent="gameLeave">Forfeit</button>
 					</div>
 				</div>
 			</div>
@@ -230,6 +238,14 @@
 							<button v-for="btn in buttons" v-bind:class="['btn', btn.class || 'btn-default']" v-bind:data-dismiss="btn.close ? 'modal' : ''" v-on:click="btn.callback ? btn.callback() : null">{{btn.label}}</button>
 						</div>
 					</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="template-marble-display">
+			<div class="marble-display">
+				<div class="marble-row" v-for="(row, y) in marbleMap" v-bind:style="{'margin-left': (marbleMap.length - 1 - y) * 16 + 'px', width: (y + 1) * 32 + 'px' }" :key="y">
+					<div class="marble" :class="[{'fade-out': val <= mVal}, 'marble-'+['red','blue','yellow','green','multicolor','orange'][mVal % 6]]" v-for="(mVal, x) in row" :key="val"></div>
 				</div>
 			</div>
 		</script>
