@@ -40,6 +40,36 @@ html, body, #app {
     top: 7px;
 }
 
+/* Marbles */
+.marble-display {
+	position: relative;
+}
+
+.marble {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	background-size: contain;
+}
+
+.marble.marble-blue { background-image: url(../img/marble-blue.png); }
+.marble.marble-green { background-image: url(../img/marble-green.png); }
+.marble.marble-multicolor { background-image: url(../img/marble-multi.png); }
+.marble.marble-orange { background-image: url(../img/marble-orange.png); }
+.marble.marble-red { background-image: url(../img/marble-red.png); }
+.marble.marble-yellow { background-image: url(../img/marble-yellow.png); }
+
+.marble-overlay-text {
+	position: absolute;
+	top: 50%; left: 50%;
+	transform: translate(-50%, -50%);
+
+	color: #111;
+    font-size: 18px;
+	font-weight: 900;
+	text-shadow: 0 0 2px #FFF, 0 0 5px #FFF;
+}
+
 /* Bitbucket header icon */
 .bitbucket-icon {
 	display: inline-block;
