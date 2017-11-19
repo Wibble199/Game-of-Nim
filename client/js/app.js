@@ -1,3 +1,12 @@
+// ---------------------------- //
+// Marble pile size generation //
+// -------------------------- //
+/** Map that contains the max size of a pile with a certain number of rows.
+ * `PILE_SIZE[3]` contains the total number of a pile with 4 rows. */
+var PILE_SIZES = [1], i = 0;
+while (PILE_SIZES[PILE_SIZES.length - 1] < 100)
+	PILE_SIZES[i + 1] = PILE_SIZES[i] + ++i + 1;
+	
 // ------------------ //
 // Global state data //
 // ---------------- //
@@ -11,6 +20,7 @@ var store = new Vuex.Store({
 
 		// Game-related vars
 		gameState: "",
+		startMarbles: 0,
 		marbles: 0,
 		yourTurn: false, // yourTurn is not the same as canPlay: It can be your turn but you may
 		canPlay: false, // not be able to play if you are waiting on a message to go to the server.
@@ -123,6 +133,7 @@ var MessageHandlers = {
 
 		// Update the application state
 		store.commit('updateGameState', msg);
+		state.startMarbles = msg.marbles;
 		state.gameState = "in-game";
 		state.inGameLobby = -1; // (no longer waiting in lobby so turn this off before the user returns to lobby)
 	},
@@ -213,6 +224,51 @@ var bsModal = Vue.component('bs-modal', {
 				this.$emit(eventName);
 		}
 	}
+});
+
+var marbleDisplay = Vue.component('marble-display', {
+	props: ["max", "val"],
+	template: '#template-marble-display',
+
+	data: function() { return {
+		marbleMap: []
+	};},
+
+	methods: {
+		recalculateMap: function(maxMarbles) {
+			// Figure out the smallest pile that we can use that will be able to contain all the marbles.
+			for (var rowCount = 1; PILE_SIZES[rowCount - 1] < maxMarbles; rowCount++);
+
+			// Create an array to hold all the marble data
+			var map = new Array(rowCount);
+			// Create a running total for number of marbles
+			var marbleVal = 0;
+			// For each row in the map (starting at the end and working forwards)
+			for (var row = rowCount - 1; row >= 0; row--) {
+				var rowData = [];
+				// For each column that is in this row (there are always `row + 1` columns for a given row)
+				for (var col = 0; col < row + 1; col++) {
+					rowData[col] = marbleVal++;
+				}
+				map[row] = rowData;
+			}
+
+			// Will produce an array that looks something like this (given examples is for maxMarbles with value of 4-6)
+			/*[
+				[5],
+				[3,4],
+				[0,1,2]
+			] */
+
+			this.$data.marbleMap = map;
+		}
+	},
+
+	watch: {
+		max: function(maxMarbles) { this.recalculateMap(maxMarbles); }
+	},
+
+	created: function() { this.recalculateMap(this.$props.max); }
 });
 
 // ------------ //
@@ -319,7 +375,8 @@ var app = new Vue({
 	store: store,
 	components: {
 		bsModal: bsModal,
-		chatPanel: chatPanel
+		chatPanel: chatPanel,
+		marbleDisplay: marbleDisplay
 	},
 
 	// Application methods

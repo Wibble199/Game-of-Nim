@@ -121,7 +121,7 @@
 		<script type="text/x-template" id="view-game">
 			<div class="row h-100">
 				<chat-panel></chat-panel>
-				<div class="col">
+				<div class="col d-flex flex-column h-100">
 					<h4 class="m-2">Game</h4>
 
 					<!-- Error dialog -->
@@ -151,20 +151,27 @@
 					</div>
 
 					<!-- Actual game render -->
-					<p>There are {{$store.state.marbles}} marble(s).</p>
-					<p>It is {{$store.state.yourTurn?"":"not "}}your turn.</p>
-					<form v-on:submit.prevent="playTurn">
-						<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
-							<div class="form-group row">
-								<label for="marble-remove-amount" class="col-sm-6 col-form-label">Marbles to remove:</label>
-								<div class="col-sm-6">
-									<input type="number" min="1" v-bind:max=" Math.max(Math.floor($store.state.marbles / 2), 1)" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
+					<div class="d-flex flex-column fg-1 p-2" v-if="$store.state.gameState=='in-game'">
+						<div class="fg-1 marble-display-container">
+							<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles"></marble-display>
+						</div>
+
+						<h3 class="text-center">{{$store.state.marbles}} marbles remain.</h3>
+						<h4 class="text-center">It is {{$store.state.yourTurn?"":"not "}}your turn.</h4>
+
+						<form v-on:submit.prevent="playTurn">
+							<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
+								<div class="form-group row">
+									<label for="marble-remove-amount" class="col-sm-6 col-form-label">Marbles to remove:</label>
+									<div class="col-sm-6">
+										<input type="number" min="1" v-bind:max=" Math.max(Math.floor($store.state.marbles / 2), 1)" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
+									</div>
 								</div>
-							</div>
-							<button type="submit" class="btn btn-primary">Play turn</button>
-						</fieldset>
-					</form>
-					<button type="button" class="btn btn-danger btn-sm" v-on:click.prevent="gameLeave">Forfeit</button>
+								<button type="submit" class="btn btn-primary">Play turn</button>
+							</fieldset>
+						</form>
+						<button type="button" class="btn btn-danger btn-sm" v-on:click.prevent="gameLeave">Forfeit</button>
+					</div>
 				</div>
 			</div>
 		</script>
@@ -210,6 +217,14 @@
 							<button v-for="btn in buttons" v-bind:class="['btn', btn.class || 'btn-default']" v-bind:data-dismiss="btn.close ? 'modal' : ''" v-on:click="btn.callback ? btn.callback() : null">{{btn.label}}</button>
 						</div>
 					</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/x-template" id="template-marble-display">
+			<div class="marble-display">
+				<div class="marble-row" v-for="(row, y) in marbleMap" v-bind:style="{'margin-left': (marbleMap.length - 1 - y) * 16 + 'px', width: (y + 1) * 32 + 'px' }" :key="y">
+					<div class="marble" :class="[{'fade-out': val <= mVal}, 'marble-'+['red','blue','yellow','green','multicolor','orange'][mVal % 6]]" v-for="(mVal, x) in row" :key="val"></div>
 				</div>
 			</div>
 		</script>
