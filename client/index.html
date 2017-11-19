@@ -53,7 +53,7 @@
 				<chat-panel></chat-panel>
 				<div class="col">
 					<div class="d-flex flex-column h-100 position-relative">
-						<h4 class="m-2">Games</h4>
+						<h4 class="m-2">Available Games</h4>
 						<ul class="list-group p-2 fg-1 game-lobby-list">
 							<li v-for="lobby in $store.state.lobbies" class="list-group-item p-2 d-flex justify-content-between align-items-center">
 								{{lobby.player1}} vs {{lobby.player2}}
@@ -151,7 +151,7 @@
 					</div>
 
 					<!-- Actual game render -->
-					<div class="d-flex flex-column fg-1 p-2" v-if="$store.state.gameState=='in-game'">
+					<div class="d-flex flex-column fg-1 p-2 position-relative" v-if="$store.state.gameState=='in-game'">
 						<div class="fg-1 marble-display-container">
 							<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles"></marble-display>
 						</div>
@@ -159,18 +159,20 @@
 						<h3 class="text-center">{{$store.state.marbles}} marbles remain.</h3>
 						<h4 class="text-center">It is {{$store.state.yourTurn?"":"not "}}your turn.</h4>
 
+						<div style="height:44px"></div> <!-- Spacer -->
+
 						<form v-on:submit.prevent="playTurn">
 							<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
-								<div class="form-group row">
-									<label for="marble-remove-amount" class="col-sm-6 col-form-label">Marbles to remove:</label>
-									<div class="col-sm-6">
-										<input type="number" min="1" v-bind:max=" Math.max(Math.floor($store.state.marbles / 2), 1)" class="form-control" id="marble-remove-amount" v-model.number="marblesToRemove">
-									</div>
+								<label for="marble-remove-amount" class="d-block text-center">How many marbles would you like to remove?</label>
+								<div class="input-group">
+									<input id="marble-remove-amount" type="number" min="1" v-bind:max="Math.max(Math.floor($store.state.marbles/2),1)" class="form-control" placeholder="Enter a number…" style="z-index:2 !important" v-model.number="marblesToRemove">
+									<span class="input-group-btn">
+										<button type="submit" class="btn btn-primary">Play turn</button>
+									</span>
 								</div>
-								<button type="submit" class="btn btn-primary">Play turn</button>
 							</fieldset>
 						</form>
-						<button type="button" class="btn btn-danger btn-sm" v-on:click.prevent="gameLeave">Forfeit</button>
+						<button type="button" class="btn btn-danger btn-sm position-absolute forfeit-button" v-on:click.prevent="gameLeave">Forfeit</button>
 					</div>
 				</div>
 			</div>
