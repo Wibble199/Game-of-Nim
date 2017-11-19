@@ -157,28 +157,29 @@
 						</div>
 
 					<!-- Actual game render -->
-					<div class="d-flex flex-column fg-1 p-2 position-relative" v-if="$store.state.gameState=='in-game'">
-						<div class="fg-1 marble-display-container">
-							<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles"></marble-display>
+						<div class="d-flex flex-column fg-1 p-2 position-relative" v-if="$store.state.gameState=='in-game'">
+							<div class="fg-1 marble-display-container">
+								<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles"></marble-display>
+							</div>
+
+							<h3 class="marble-text-display text-center">{{$store.state.marbles}} marbles remain.</h3>
+							<h4 class="marble-text-display text-center">It is {{$store.state.yourTurn?"":"not "}}your turn.</h4>
+
+							<div class="d-none d-sm-block" style="height:44px"></div> <!-- Spacer -->
+
+							<form v-on:submit.prevent="playTurn">
+								<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
+									<label for="marble-remove-amount" class="d-block text-center">How many marbles would you like to remove?</label>
+									<div class="input-group">
+										<input id="marble-remove-amount" type="number" min="1" v-bind:max="Math.max(Math.floor($store.state.marbles/2),1)" class="form-control" placeholder="Enter a number…" style="z-index:2 !important" v-model.number="marblesToRemove">
+										<span class="input-group-btn">
+											<button type="submit" class="btn btn-primary">Play turn</button>
+										</span>
+									</div>
+								</fieldset>
+							</form>
+							<button type="button" class="btn btn-danger btn-sm position-absolute forfeit-button" v-on:click.prevent="gameLeave">Forfeit</button>
 						</div>
-
-						<h3 class="marble-text-display text-center">{{$store.state.marbles}} marbles remain.</h3>
-						<h4 class="marble-text-display text-center">It is {{$store.state.yourTurn?"":"not "}}your turn.</h4>
-
-						<div class="d-none d-sm-block" style="height:44px"></div> <!-- Spacer -->
-
-						<form v-on:submit.prevent="playTurn">
-							<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
-								<label for="marble-remove-amount" class="d-block text-center">How many marbles would you like to remove?</label>
-								<div class="input-group">
-									<input id="marble-remove-amount" type="number" min="1" v-bind:max="Math.max(Math.floor($store.state.marbles/2),1)" class="form-control" placeholder="Enter a number…" style="z-index:2 !important" v-model.number="marblesToRemove">
-									<span class="input-group-btn">
-										<button type="submit" class="btn btn-primary">Play turn</button>
-									</span>
-								</div>
-							</fieldset>
-						</form>
-						<button type="button" class="btn btn-danger btn-sm position-absolute forfeit-button" v-on:click.prevent="gameLeave">Forfeit</button>
 					</div>
 				</div>
 			</div>
