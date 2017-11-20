@@ -23,11 +23,11 @@
 				<router-view></router-view>
 			</div>
 
-			<bs-modal id="app-loading-modal" title="Loading" v-bind:close-button="false" data-backdrop="static" data-keyboard="false">
+			<bs-modal id="app-loading-modal" title="Loading" :close-button="false" data-backdrop="static" data-keyboard="false">
 				<p>One sec, we're working on it...</p>
 			</bs-modal>
 
-			<bs-modal id="network-error-modal" title="Network Error" v-bind:buttons="[{label:'Reload', class:'btn-primary', callback: reload}]" v-bind:close-button="false" data-backdrop="static" data-keyboard="false">
+			<bs-modal id="network-error-modal" title="Network Error" :buttons="[{label:'Reload', class:'btn-primary', callback: reload}]" :close-button="false" data-backdrop="static" data-keyboard="false">
 				<p>You have been disconnected from the server.</p>
 			</bs-modal>
 		</div>
@@ -38,7 +38,7 @@
 				<h1 class="display-3">Welcome!</h1>
 				<p class="lead">The game of Nim is a game where players must remove one or more objects from a pile. The losing player is the player to take the last item. In this variant you must take atleast one object, but may take up to half of the total objects remaining.</p>
 				<hr class="my-4">
-				<form v-on:submit.prevent="enterName">
+				<form @submit.prevent="enterName">
 					<div class="form-group">
 						<label for="player-name">Enter your name below to get started!</label>
 						<input type="text" class="form-control" id="player-name" placeholder="What do we call you?" v-model="$store.state.username">
@@ -54,7 +54,7 @@
 		<script type="text/x-template" id="view-lobby">
 			<div class="d-flex flex-column h-100">
 				<mobile-nav></mobile-nav>
-				<div class="row fg-1 w-sm-200 mobile-switch-panel" v-bind:class="{switch: $store.state.mobileShowGamePanel}">
+				<div class="row fg-1 w-sm-200 mobile-switch-panel" :class="{switch: $store.state.mobileShowGamePanel}">
 					<chat-panel></chat-panel>
 					<div class="col">
 						<div class="d-flex flex-column h-100 position-relative">
@@ -62,17 +62,17 @@
 							<ul class="list-group p-2 fg-1 game-lobby-list">
 								<li v-for="lobby in $store.state.lobbies" class="list-group-item p-2 d-flex justify-content-between align-items-center">
 									{{lobby.player1}} vs {{lobby.player2}}
-									<button type="button" class="btn btn-info btn-sm" v-bind:class="{disabled:$store.state.inGameLobby==lobby.gameId || lobby.gameState!='in-lobby'}" v-on:click.prevent="joinGameLobby(lobby.gameId)">Join</button>
+									<button type="button" class="btn btn-info btn-sm" :class="{disabled:$store.state.inGameLobby==lobby.gameId || lobby.gameState!='in-lobby'}" @click.prevent="joinGameLobby(lobby.gameId)">Join</button>
 								</li>
 							</ul>
 
 							<!-- Host game settings panel -->
-							<div class="card m-2 create-game-popover" v-bind:class="[showCreateGamePopover?'':'out']">
+							<div class="card m-2 create-game-popover" :class="[showCreateGamePopover?'':'out']">
 								<div class="card-body">
-									<button type="button" class="close" v-on:click.prevent="showCreateGamePopover=false;"><span>&times;</span></button>
+									<button type="button" class="close" @click.prevent="showCreateGamePopover=false;"><span>&times;</span></button>
 									<h4 class="card-title">Create Game</h4>
 									<h6 class="card-subtitle mb-2 text-muted">Host a game for another player to join, or get some practice against the AI</h6>
-									<form v-on:submit.prevent="submitCreateGameLobby">
+									<form @submit.prevent="submitCreateGameLobby">
 										<!-- Difficulty setting -->
 										<div class="form-group row">
 											<label class="col col-sm-4 col-form-label">Difficulty</label>
@@ -108,13 +108,13 @@
 							</div>
 
 							<div class="p-2" v-if="$store.state.inGameLobby==-1">
-								<button type="button" class="btn btn-primary btn-block" v-on:click.prevent="showCreateGamePopover=true;">Create Game</button>
+								<button type="button" class="btn btn-primary btn-block" @click.prevent="showCreateGamePopover=true;">Create Game</button>
 							</div>
 
 							<div class="card text-white bg-dark m-sm-2 p-2" style="margin:14px -15px 0;" v-if="$store.state.inGameLobby!=-1">
 								<div class="card-body p-1 clearfix" style="height:41px;">
 									<p class="lobby-waiting-paragraph float-left">Waiting on another player&hellip;</p>
-									<button type="button" class="btn btn-sm btn-danger float-right" v-on:click.prevent="cancelLobbyWaiting">Stop waiting</button>
+									<button type="button" class="btn btn-sm btn-danger float-right" @click.prevent="cancelLobbyWaiting">Stop waiting</button>
 								</div>
 							</div>
 						</div>
@@ -127,25 +127,25 @@
 		<script type="text/x-template" id="view-game">
 			<div class="d-flex flex-column h-100">
 				<mobile-nav></mobile-nav>
-				<div class="row h-100 w-sm-200 mobile-switch-panel" v-bind:class="{switch: $store.state.mobileShowGamePanel}">
+				<div class="row h-100 w-sm-200 mobile-switch-panel" :class="{switch: $store.state.mobileShowGamePanel}">
 					<chat-panel></chat-panel>
 					<div class="col d-flex flex-column h-100">
 						<h4 class="m-2">Game</h4>
 
 						<!-- Error dialog -->
 						<div class="alert alert-dismissible alert-danger m-2" v-if="$store.state.lastErrorMessage">
-							<button type="button" class="close" v-on:click.prevent="$store.state.lastErrorMessage=''">&times;</button>
+							<button type="button" class="close" @click.prevent="$store.state.lastErrorMessage=''">&times;</button>
 							<u>Error:</u> {{$store.state.lastErrorMessage}}
 						</div>
 
 						<!-- Rematch dialog -->
-						<div class="card text-dark m-2" v-bind:class="[$store.state.lastWinner ? 'bg-success' : 'bg-danger']" v-if="$store.state.gameState=='game-over'">
+						<div class="card text-dark m-2" :class="[$store.state.lastWinner ? 'bg-success' : 'bg-danger']" v-if="$store.state.gameState=='game-over'">
 							<div class="card-body">
 								<h4 class="card-title">{{$store.state.lastWinner ? "Congratulations, you won!" : "Game over, you lost"}}</h4>
 								<p class="card-text">Would you like to play a rematch?</p>
 								<p class="card-text">{{$store.state.rematchStatus}}</p>
-								<button type="button" class="btn btn-outline-primary" v-on:click.prevent="gameLeave">Return to Lobby</button>
-								<button type="button" class="btn btn-outline-primary" v-on:click.prevent="voteRematch" v-bind:disabled="!$store.state.allowRematchVote">Rematch</button>
+								<button type="button" class="btn btn-outline-primary" @click.prevent="gameLeave">Return to Lobby</button>
+								<button type="button" class="btn btn-outline-primary" @click.prevent="voteRematch" :disabled="!$store.state.allowRematchVote">Rematch</button>
 							</div>
 						</div>
 
@@ -154,7 +154,7 @@
 							<div class="card-body">
 								<h4 class="card-title">You win by default</h4>
 								<p class="card-text">Your opponent forfeited the match and you have won.</p>
-								<button type="button" class="btn btn-outline-primary" v-on:click.prevent="gameLeave">Return to Lobby</button>
+								<button type="button" class="btn btn-outline-primary" @click.prevent="gameLeave">Return to Lobby</button>
 							</div>
 						</div>
 
@@ -169,18 +169,18 @@
 
 							<div class="d-none d-sm-block" style="height:44px"></div> <!-- Spacer -->
 
-							<form v-on:submit.prevent="playTurn">
-								<fieldset v-bind:disabled="!($store.state.yourTurn && $store.state.canPlay)">
+							<form @submit.prevent="playTurn">
+								<fieldset :disabled="!($store.state.yourTurn && $store.state.canPlay)">
 									<label for="marble-remove-amount" class="d-block text-center">How many marbles would you like to remove?</label>
 									<div class="input-group">
-										<input id="marble-remove-amount" type="number" min="1" v-bind:max="Math.max(Math.floor($store.state.marbles/2),1)" class="form-control" placeholder="Enter a number…" style="z-index:2 !important" v-model.number="marblesToRemove">
+										<input id="marble-remove-amount" type="number" min="1" :max="Math.max(Math.floor($store.state.marbles/2),1)" class="form-control" placeholder="Enter a number…" style="z-index:2 !important" v-model.number="marblesToRemove">
 										<span class="input-group-btn">
 											<button type="submit" class="btn btn-primary">Play turn</button>
 										</span>
 									</div>
 								</fieldset>
 							</form>
-							<button type="button" class="btn btn-danger btn-sm position-absolute forfeit-button" v-on:click.prevent="gameLeave">Forfeit</button>
+							<button type="button" class="btn btn-danger btn-sm position-absolute forfeit-button" @click.prevent="gameLeave">Forfeit</button>
 						</div>
 					</div>
 				</div>
@@ -201,7 +201,7 @@
 							</div>
 						</div>
 					</div>
-					<form class="p-2" v-on:submit.prevent="submitMessage">
+					<form class="p-2" @submit.prevent="submitMessage">
 						<div class="input-group">
 							<input type="text" class="form-control" placeholder="Message..." v-model="messageInput">
 							<span class="input-group-btn"><button class="btn btn-primary" type="submit">Send</button></span>
@@ -213,11 +213,11 @@
 
 		<script type="text/x-template" id="template-mobile-nav">
 			<div class="d-flex d-sm-none btn-group w-100 mobile-nav">
-				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" v-bind:class="{active: !$store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=false;$store.state.newMessages=0">
+				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" :class="{active: !$store.state.mobileShowGamePanel}" @click.prevent="$store.state.mobileShowGamePanel=false;$store.state.newMessages=0">
 					Messages
 					<span class="badge badge-pill badge-danger" v-if="$store.state.newMessages">{{$store.state.newMessages}}</span>
 				</a>
-				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" v-bind:class="{active: $store.state.mobileShowGamePanel}" v-on:click.prevent="$store.state.mobileShowGamePanel=true;$store.state.gameNotification=false">
+				<a href="javascript:void" class="btn btn-mobile-nav" style="flex:1 1 0" :class="{active: $store.state.mobileShowGamePanel}" @click.prevent="$store.state.mobileShowGamePanel=true;$store.state.gameNotification=false">
 					Game
 					<span class="badge badge-pill badge-danger" v-if="$store.state.gameNotification">!</span>
 				</a>
@@ -238,7 +238,7 @@
 							<slot></slot>
 						</div>
 						<div class="modal-footer" v-if="buttons">
-							<button v-for="btn in buttons" v-bind:class="['btn', btn.class || 'btn-default']" v-bind:data-dismiss="btn.close ? 'modal' : ''" v-on:click="btn.callback ? btn.callback() : null">{{btn.label}}</button>
+							<button v-for="btn in buttons" :class="['btn', btn.class || 'btn-default']" :data-dismiss="btn.close ? 'modal' : ''" @click="btn.callback ? btn.callback() : null">{{btn.label}}</button>
 						</div>
 					</div>
 				</div>
@@ -247,7 +247,7 @@
 
 		<script type="text/x-template" id="template-marble-display">
 			<div class="marble-display">
-				<div class="marble-row" v-for="(row, y) in marbleMap" v-bind:style="{'margin-left': (marbleMap.length - 1 - y) * 16 + 'px', width: (y + 1) * 32 + 'px' }" :key="y">
+				<div class="marble-row" v-for="(row, y) in marbleMap" :style="{'margin-left': (marbleMap.length - 1 - y) * 16 + 'px', width: (y + 1) * 32 + 'px' }" :key="y">
 					<div class="marble" :class="[{'hide': val <= mVal, 'fade-out': val <= mVal && mVal < lastVal}, 'marble-'+['red','blue','yellow','green','multicolor','orange'][mVal % 6]]" v-for="(mVal, x) in row" :key="val"></div>
 				</div>
 			</div>
