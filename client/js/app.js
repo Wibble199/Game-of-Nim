@@ -22,6 +22,7 @@ var store = new Vuex.Store({
 		gameState: "",
 		startMarbles: 0,
 		marbles: 0,
+		lastMarbles: 0, // store last marble count so we can animate the ones that have been removed
 		yourTurn: false, // yourTurn is not the same as canPlay: It can be your turn but you may
 		canPlay: false, // not be able to play if you are waiting on a message to go to the server.
 		lastErrorMessage: "",
@@ -72,6 +73,7 @@ var store = new Vuex.Store({
 		/** Updates the game state based on data received from the server.
 		 * Will update marble count and allow or block the user from playing a turn. */
 		updateGameState: function(state, data) {
+			state.lastMarbles = state.marbles;
 			state.marbles = data.marbles;
 			state.yourTurn = state.canPlay = data.yourTurn;
 		},
@@ -154,7 +156,7 @@ var MessageHandlers = {
 
 		// Update the application state
 		store.commit('updateGameState', msg);
-		state.startMarbles = msg.marbles;
+		state.startMarbles = state.lastMarbles =  msg.marbles;
 		state.gameState = "in-game";
 		state.inGameLobby = -1; // (no longer waiting in lobby so turn this off before the user returns to lobby)
 		store.commit('mobileAddGameNotification');
@@ -263,7 +265,7 @@ var bsModal = Vue.component('bs-modal', {
 });
 
 var marbleDisplay = Vue.component('marble-display', {
-	props: ["max", "val"],
+	props: ["max", "val", "last-val"],
 	template: '#template-marble-display',
 
 	data: function() { return {

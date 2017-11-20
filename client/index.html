@@ -161,7 +161,7 @@
 					<!-- Actual game render -->
 						<div class="d-flex flex-column fg-1 p-2 position-relative" v-if="$store.state.gameState=='in-game'">
 							<div class="fg-1 marble-display-container">
-								<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles"></marble-display>
+								<marble-display :max="$store.state.startMarbles" :val="$store.state.marbles" :last-val="$store.state.lastMarbles"></marble-display>
 							</div>
 
 							<h3 class="marble-text-display text-center">{{$store.state.marbles}} marbles remain.</h3>
@@ -248,7 +248,7 @@
 		<script type="text/x-template" id="template-marble-display">
 			<div class="marble-display">
 				<div class="marble-row" v-for="(row, y) in marbleMap" v-bind:style="{'margin-left': (marbleMap.length - 1 - y) * 16 + 'px', width: (y + 1) * 32 + 'px' }" :key="y">
-					<div class="marble" :class="[{'fade-out': val <= mVal}, 'marble-'+['red','blue','yellow','green','multicolor','orange'][mVal % 6]]" v-for="(mVal, x) in row" :key="val"></div>
+					<div class="marble" :class="[{'hide': val <= mVal, 'fade-out': val <= mVal && mVal < lastVal}, 'marble-'+['red','blue','yellow','green','multicolor','orange'][mVal % 6]]" v-for="(mVal, x) in row" :key="val"></div>
 				</div>
 			</div>
 		</script>

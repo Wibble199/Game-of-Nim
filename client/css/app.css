@@ -84,9 +84,12 @@ html, body, #app {
 	margin-top: -10px;
 }
 
-.fade-out {
-	opacity: 0;
-	transition: opacity 300ms ease-in-out;
+.hide { opacity: 0; }
+.fade-out { animation: fade-out 400ms ease-in-out 1; }
+
+@keyframes fade-out {
+	0% { opacity: 1; }
+	100% { opacity: 0; }
 }
 
 /* Mobile optimisations */
