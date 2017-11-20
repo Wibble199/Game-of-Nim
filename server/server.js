@@ -38,7 +38,7 @@ var server = http.createServer((req, res) => {
 		}
 	});
 
-}).listen(HTTP_PORT);
+}).listen(HTTP_PORT, () => console.log(`HTTP server listening on port ${HTTP_PORT}.`));
 
 /* ----------------------- */
 /* Setup WebSocket server */

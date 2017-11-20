@@ -3,9 +3,17 @@
   "version": "0.0.1",
   "description": "CIS3110 Distributed Systems Coursework",
   "main": "server/server.js",
+  "scripts": {
+    "build": "pkg package.json"
+  },
+  "bin": "server/server.js",
   "author": "Will Bennion (22925040)",
   "license": "ISC",
   "dependencies": {
     "ws": "^3.2.0"
+  },
+  "pkg": {
+    "assets": "client/**/*",
+    "targets": ["node6-win-x64"]
   }
 }
