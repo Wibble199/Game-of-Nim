@@ -4,6 +4,7 @@
   "description": "CIS3110 Distributed Systems Coursework",
   "main": "server/server.js",
   "scripts": {
+    "start": "node server/server.js",
     "build": "pkg package.json"
   },
   "bin": "server/server.js",
